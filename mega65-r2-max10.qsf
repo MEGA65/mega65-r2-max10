@@ -38,7 +38,6 @@
 
 set_global_assignment -name FAMILY "MAX 10"
 set_global_assignment -name DEVICE 10M08SAU169C8G
-set_global_assignment -name TOP_LEVEL_ENTITY top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "21:23:43  JUNE 22, 2019"
 set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
@@ -107,7 +106,7 @@ set_location_assignment PIN_K8 -to FPGA_TMS
 set_location_assignment PIN_L10 -to CPLD_DBG0
 set_location_assignment PIN_M10 -to CPLD_DBG2
 set_location_assignment PIN_N12 -to K_TMS
-set_location_assignment PIN_G( -to KB_IO2
+set_location_assignment PIN_G9 -to KB_IO2
 set_location_assignment PIN_G10 -to KB_TCK
 set_location_assignment PIN_F13 -to KB_IO3
 set_location_assignment PIN_F12 -to KB_TMS
@@ -123,7 +122,7 @@ set_location_assignment PIN_A12 -to CPLD_CFG0
 set_location_assignment PIN_D9 -to KB_TDI
 set_location_assignment PIN_D12 -to PMOD1_FLG
 set_location_assignment PIN_D11 -to PMOD1_EN
-set_location_assignment PIN_C13 -to PMOD2 FLG
+set_location_assignment PIN_C13 -to PMOD2_FLG
 set_location_assignment PIN_A11 -to CPLD_CFG2
 set_location_assignment PIN_B5 -to TE_TCK
 set_location_assignment PIN_A4 -to TE_TDO
