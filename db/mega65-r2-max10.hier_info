@@ -1,0 +1,17 @@
+|top
+te_uart_tx => te_uart_rx.DATAIN
+te_uart_rx <= te_uart_tx.DB_MAX_OUTPUT_PORT_TYPE
+dbg_uart_tx => ~NO_FANOUT~
+dbg_uart_rx <= <VCC>
+
+
+|top|intclock:u0
+clkout <= altera_int_osc:int_osc_0.clkout
+oscena => oscena.IN1
+
+
+|top|intclock:u0|altera_int_osc:int_osc_0
+clkout <= oscillator_dut.CLKOUT
+oscena => oscillator_dut.OSCENA
+
+

@@ -1,0 +1,27 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+
+ENTITY mega65r2max10 IS
+   PORT (
+	   -- UART pins on the JB1 JTAG connector
+		te_uart_tx : out std_logic;
+		te_uart_rx : in std_logic;
+		
+		-- The UART pins on the Xilinx FPGA
+		dbg_uart_tx : in std_logic;
+		dbg_uart_rx : out std_logic
+		);
+end entity mega65r2max10;	
+	
+architecture simple of mega65r2max10 is
+
+begin
+
+		-- Make UART loopback
+      te_uart_tx <= te_uart_rx;
+		
+		dbg_uart_rx <= '1';
+		
+end architecture mega65r2max10;

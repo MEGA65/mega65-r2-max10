@@ -1,0 +1,17 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "te_uart_rx",
+					"strict" : false
+				},
+				{
+					"name" : "te_uart_tx",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
