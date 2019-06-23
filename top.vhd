@@ -46,14 +46,23 @@ ENTITY top IS
     -- Keyboard connector
     -----------------------------------------------------------------
     -- pins connecting to xilinx fpga
-    kb_tdo : in std_logic;
-    kb_tdi : out std_logic;
+    kb_tdo : out std_logic;
+    kb_tdi : in std_logic;
     kb_tck : in std_logic;
     kb_tms : in std_logic;
     kb_jtagen : in std_logic;
-    kb_io1 : in std_logic;
-    kb_io2 : in std_logic;
-    kb_io3 : in std_logic;
+    kb_io1 : out std_logic;
+    kb_io2 : out std_logic;
+    kb_io3 : out std_logic;
+    -- pins connecting to actual keyboard
+    k_tdo : in std_logic;
+    k_tdi : out std_logic;
+    k_tck : out std_logic;
+    k_tms : out std_logic;
+    k_jtagen : out std_logic;
+    k_io1 : in std_logic;
+    k_io2 : in std_logic;
+    k_io3 : in std_logic;
 
     -----------------------------------------------------------------
     -- Reset button
@@ -97,17 +106,17 @@ begin
 
   -- Connect keyboard
   kb_tdo <= k_tdo;
-  k_tdi <= kb_tdo;
-  kb_tck_ <= k_tck;
-  kb_tms <= k_tms;
-  kb_jtagen <= k_jtagen;
+  k_tdi <= kb_tdi;
+  k_tck <= kb_tck;
+  k_tms <= kb_tms;
+  k_jtagen <= kb_jtagen;
   kb_io1 <= k_io1;
   kb_io2 <= k_io2;
   kb_io3 <= k_io3;
 
   -- Connect Xilinx FPGA to JTAG interface
   fpga_tck <= te_tck;
-  te_tdo <= fpga_tco;
+  te_tdo <= fpga_tdo;
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
 

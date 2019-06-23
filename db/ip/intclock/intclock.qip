@@ -2,7 +2,7 @@ set_global_assignment -entity "intclock" -library "intclock" -name IP_TOOL_NAME 
 set_global_assignment -entity "intclock" -library "intclock" -name IP_TOOL_VERSION "18.1"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_TOOL_ENV "Qsys"
 set_global_assignment -library "intclock" -name SOPCINFO_FILE [file join $::quartus(qip_path) "../../../intclock.sopcinfo"]
-set_global_assignment -entity "intclock" -library "intclock" -name SLD_INFO "QSYS_NAME intclock HAS_SOPCINFO 1 GENERATION_ID 1561283429"
+set_global_assignment -entity "intclock" -library "intclock" -name SLD_INFO "QSYS_NAME intclock HAS_SOPCINFO 1 GENERATION_ID 1561297663"
 set_global_assignment -library "intclock" -name SLD_FILE [file join $::quartus(qip_path) "intclock.debuginfo"]
 set_global_assignment -entity "intclock" -library "intclock" -name IP_TARGETED_DEVICE_FAMILY "MAX 10"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_GENERATED_DEVICE_FAMILY "{MAX 10}"
@@ -14,7 +14,7 @@ set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_REPORT_HIERARCHY "On"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_VERSION "MS4w"
-set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTU2MTI4MzQyOQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTU2MTI5NzY2Mw==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::TUFYIDEw::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::MTBNMDhTQVUxNjlDOEc=::QXV0byBERVZJQ0U="
 set_global_assignment -entity "intclock" -library "intclock" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfU1BFRURHUkFERQ==::OA==::QXV0byBERVZJQ0VfU1BFRURHUkFERQ=="
