@@ -60,10 +60,140 @@ set_global_assignment -name QSYS_FILE intclock.qsys
 set_global_assignment -name VHDL_FILE top.vhd
 set_global_assignment -name CDF_FILE output_files/Chain4.cdf
 
+# UART connections on the TE0790 JTAG socket
 set_location_assignment PIN_A5 -to te_uart_rx
 set_location_assignment PIN_B4 -to te_uart_tx
+
+# UART connections to Xilinx FPGA
 set_location_assignment PIN_J10 -to dbg_uart_rx
 set_location_assignment PIN_K10 -to dbg_uart_tx
 
+# 4.67V power rail measurement
+set_location_assignment PIN_D2 -to CPLD_ADC1
+# 1.8V power rail measurement
+set_location_assignment PIN_C2 -to CPLD_ADC2
+# 1V power rail measurement
+set_location_assignment PIN_D1 -to CPLD_ADC3
+
+# MEGA65 reset button.
+# (By convention holding it down enables JTAG programming of the MAX10
+# some how?)
+set_location_assignment PIN_E5 -to RESET_BTN
+# CPU reset input of Xilinx FPGA
+set_location_assignment PIN_J9 -to FPGA_RESET_N
+
+# MicroSD card interface / MAX10 emergency JTAG programming interface
+# (Full-size SD card interface is directly connected to the Xilinx FPGA)
+# microSD card SD_D2 (M_TCK)
+set_location_assignment PIN_G2 -to USD_D2
+# microSD card SD_D1 (M_TMS)
+set_location_assignment PIN_G1 -to USD_D1
+# microSD card SD_CMD (M_TDO)
+set_location_assignment PIN_F6 -to USD_CMD
+# microSD card SD_D0 (M_TDI)
+set_location_assignment PIN_F5 -to USD_D0
+# microSD card SD_CLK (M_TX)
+set_location_assignment PIN_A2 -to SD_CLK
+# microSD card SD_D3 (M_RX)
+set_location_assignment PIN_B2 -to SD_D3
+
+# HDMI hot-plug detect line connected to input of 7511 HDMI driver
+# Can be ignored until we get HDMI working
+set_location_assignment PIN_M1 -to HDMI_PD
+
+# Active low power save input to 7125 VDAC for VGA output
+# Should remain high
+set_location_assignment PIN_N2 -to VDAC_PSAVE_N
+
+# Communications channel between Xilinx and MAX10 FPGA?
+# FPGA_TX pin on Xilinx FPGA
+set_location_assignment PIN_K11 -to FPGA_TX
+set_location_assignment PIN_L11 -to FPGA_RX
+
+# 10 pin keyboard connector
+
+# Keyboard connector, pin 7
+set_location_assignment PIN_L12 -to K_TDO
+# Keyboard connector, pin 9
+set_location_assignment PIN_K12 -to K_IO2
+# Keyboard connector, pin 10
+set_location_assignment PIN_J12 -to K_IO3
+# Keyboard connector, pin 8
+set_location_assignment PIN_L13 -to K_IO1
+# Keyboard connector, pin 5
+M12 K_TCK
+# Keyboard connector, pin 6
+M13 K_TDI
+# Keyboard connector, pin 3
+M11 K_JTAGEN
+# Keyboard connector, pin 4
+N12 K_TMS
+
+# Keyboard connection to Xilinx FPGA
+set_location_assignment PIN_F9 -to KB_JTAGEN
+set_location_assignment PIN_G9 -to KB_IO2
+set_location_assignment PIN_G10 -to KB_TCK
+set_location_assignment PIN_F13 -to KB_IO3
+set_location_assignment PIN_F12 -to KB_TMS
+set_location_assignment PIN_F10 -to KB_TDO
+set_location_assignment PIN_E9 -to KB_IO1
+set_location_assignment PIN_D9 -to KB_TDI
+
+# Sense 5V power rail status?
+set_location_assignment PIN_J13 -to 5V_JOY_PG
+# enable 5V power output
+set_location_assignment PIN_H13 -to EN_5V_JOY_EN
+
+# Leave high impedance for now. Can be overdriven to force Xilinx FPGA to reprogram
+set_location_assignment PIN_G12 -to FPGA_PROG_B
+set_location_assignment PIN_K6 -to FPGA_INIT
+
+# Check if Xilinx FPGA started or not
+set_location_assignment PIN_J6 -to FPGA_DONE
+
+# Xilinx FPGA JTAG interface. Can be connected to TE0790 to allow
+# JTAG via that interface
+set_location_assignment PIN_J5 -to FPGA_TCK
+set_location_assignment PIN_K7 -to FPGA_TDO
+set_location_assignment PIN_J7 -to FPGA_TDI
+set_location_assignment PIN_K8 -to FPGA_TMS
+
+# TE0790 JTAG interface pins
+set_location_assignment PIN_B5 -to TE_TCK
+set_location_assignment PIN_A4 -to TE_TDO
+set_location_assignment PIN_A3 -to TE_TDI
+set_location_assignment PIN_B3 -to TE_TMS
+
+# Debug header on main board
+set_location_assignment PIN_L10 -to CPLD_DBG0
+set_location_assignment PIN_N10 -to CPLD_DBG1
+set_location_assignment PIN_M10 -to CPLD_DBG2
+set_location_assignment PIN_N9 -to CPLD_DBG3
+set_location_assignment PIN_M9 -to CPLD_DBG4
+set_location_assignment PIN_N8 -to CPLD_DBG5
+set_location_assignment PIN_M8 -to CPLD_DBG6
+set_location_assignment PIN_N7 -to CPLD_DBG7
+set_location_assignment PIN_N6 -to CPLD_DBG8
+set_location_assignment PIN_M7 -to CPLD_DBG9
+set_location_assignment PIN_M5 -to CPLD_DBG10
+set_location_assignment PIN_N5 -to CPLD_DBG11
+
+# 2 LEDs on the main board
+set_location_assignment PIN_B12 -to LED_R
+set_location_assignment PIN_B13 -to LED_G
+
+# Dip switches for reading configuration information
+set_location_assignment PIN_A12 -to CPLD_CFG0
+set_location_assignment PIN_C11 -to CPLD_CFG1
+set_location_assignment PIN_A11 -to CPLD_CFG2
+set_location_assignment PIN_B11 -to CPLD_CFG3
+
+# Hot-swap control for PMOD connectors.
+# _EN enables power
+# _FLG indicates over temp/over current alert
+set_location_assignment PIN_D12 -to PMOD1_FLG
+set_location_assignment PIN_D11 -to PMOD1_EN
+set_location_assignment PIN_C13 -to PMOD2_FLG
+set_location_assignment PIN_C12 -to PMOD2_EN
 
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
