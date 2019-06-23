@@ -13,8 +13,8 @@ ENTITY top IS
     te_uart_tx : in std_logic;
     te_uart_rx : out std_logic;
     -- The UART pins on the Xilinx FPGA
-    dbg_uart_tx : out std_logic;
-    dbg_uart_rx : in std_logic;
+    dbg_uart_tx : in std_logic;
+    dbg_uart_rx : out std_logic;
 
     -----------------------------------------------------------------
     -- Xilinx FPGA JTAG interface
@@ -99,8 +99,8 @@ begin
   
   
   -- Make UART loopback
-  te_uart_rx <= dbg_uart_rx;
-  dbg_uart_tx <= te_uart_tx;
+  dbg_uart_rx <= te_uart_tx;
+  te_uart_rx <= dbg_uart_tx;
 
   -- Connect keyboard
   kb_tdo <= k_tdo;
