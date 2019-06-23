@@ -6,21 +6,12 @@ dbg_uart_rx <= <VCC>
 
 
 |top|intclock:u0
-inclk => inclk.IN1
-outclk <= intclock_altclkctrl_0:altclkctrl_0.outclk
+clkout <= altera_int_osc:int_osc_0.clkout
+oscena => oscena.IN1
 
 
-|top|intclock:u0|intclock_altclkctrl_0:altclkctrl_0
-inclk => sub_wire3[0].IN1
-outclk <= intclock_altclkctrl_0_sub:intclock_altclkctrl_0_sub_component.outclk
-
-
-|top|intclock:u0|intclock_altclkctrl_0:altclkctrl_0|intclock_altclkctrl_0_sub:intclock_altclkctrl_0_sub_component
-ena => clkctrl1.ENA
-inclk[0] => clkctrl1.INCLK
-inclk[1] => clkctrl1.INCLK1
-inclk[2] => clkctrl1.INCLK2
-inclk[3] => clkctrl1.INCLK3
-outclk <= clkctrl1.CLK
+|top|intclock:u0|altera_int_osc:int_osc_0
+clkout <= oscillator_dut.CLKOUT
+oscena => oscillator_dut.OSCENA
 
 
