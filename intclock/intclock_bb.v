@@ -1,8 +1,8 @@
 
 module intclock (
-	inclk,
-	outclk);	
+	oscena,
+	clkout);	
 
-	input		inclk;
-	output		outclk;
+	input		oscena;
+	output		clkout;
 endmodule

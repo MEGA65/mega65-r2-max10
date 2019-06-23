@@ -8,25 +8,35 @@ use IEEE.numeric_std.all;
 
 entity intclock is
 	port (
-		inclk  : in  std_logic := '0'; --  altclkctrl_input.inclk
-		outclk : out std_logic         -- altclkctrl_output.outclk
+		clkout : out std_logic;        -- clkout.clk
+		oscena : in  std_logic := '0'  -- oscena.oscena
 	);
 end entity intclock;
 
 architecture rtl of intclock is
-	component intclock_altclkctrl_0 is
-		port (
-			inclk  : in  std_logic := 'X'; -- inclk
-			outclk : out std_logic         -- outclk
+	component altera_int_osc is
+		generic (
+			DEVICE_FAMILY   : string := "";
+			DEVICE_ID       : string := "UNKNOWN";
+			CLOCK_FREQUENCY : string := "UNKNOWN"
 		);
-	end component intclock_altclkctrl_0;
+		port (
+			oscena : in  std_logic := 'X'; -- oscena
+			clkout : out std_logic         -- clk
+		);
+	end component altera_int_osc;
 
 begin
 
-	altclkctrl_0 : component intclock_altclkctrl_0
+	int_osc_0 : component altera_int_osc
+		generic map (
+			DEVICE_FAMILY   => "MAX 10",
+			DEVICE_ID       => "08",
+			CLOCK_FREQUENCY => "55"
+		)
 		port map (
-			inclk  => inclk,  --  altclkctrl_input.inclk
-			outclk => outclk  -- altclkctrl_output.outclk
+			oscena => oscena, -- oscena.oscena
+			clkout => clkout  -- clkout.clk
 		);
 
 end architecture rtl; -- of intclock

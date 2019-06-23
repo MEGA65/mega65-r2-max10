@@ -23,9 +23,6 @@ component intclock is
                         clkout : out std_logic         -- clk
                 );
         end component intclock;
-
-XXX add divider, and try to make clock visible on UART pin
-		  
 		  
   signal clkout : std_logic := '0';
 

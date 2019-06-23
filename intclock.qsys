@@ -9,7 +9,7 @@
    categories="" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
-   element altclkctrl_0
+   element int_osc_0
    {
       datum _sortIndex
       {
@@ -38,32 +38,23 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
- <interface
-   name="altclkctrl_input"
-   internal="altclkctrl_0.altclkctrl_input"
-   type="conduit"
-   dir="end">
-  <port name="inclk" internal="inclk" />
+ <interface name="clkout" internal="int_osc_0.clkout" type="clock" dir="start">
+  <port name="clkout" internal="clkout" />
  </interface>
- <interface
-   name="altclkctrl_output"
-   internal="altclkctrl_0.altclkctrl_output"
-   type="conduit"
-   dir="end">
-  <port name="outclk" internal="outclk" />
+ <interface name="oscena" internal="int_osc_0.oscena" type="conduit" dir="end">
+  <port name="oscena" internal="oscena" />
  </interface>
  <module
-   name="altclkctrl_0"
-   kind="altclkctrl"
+   name="int_osc_0"
+   kind="altera_int_osc"
    version="18.1"
    enabled="1"
    autoexport="1">
-  <parameter name="CLOCK_TYPE" value="1" />
+  <parameter name="CBX_AUTO_BLACKBOX" value="ALL" />
+  <parameter name="CLOCK_FREQUENCY_1" value="55" />
+  <parameter name="CLOCK_FREQUENCY_2" value="77" />
   <parameter name="DEVICE_FAMILY" value="MAX 10" />
-  <parameter name="ENA_REGISTER_MODE" value="1" />
-  <parameter name="GUI_USE_ENA" value="false" />
-  <parameter name="NUMBER_OF_CLOCKS" value="1" />
-  <parameter name="USE_GLITCH_FREE_SWITCH_OVER_IMPLEMENTATION" value="false" />
+  <parameter name="PART_NAME" value="10M08SAU169C8G" />
  </module>
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />

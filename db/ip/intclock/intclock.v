@@ -4,17 +4,13 @@
 
 `timescale 1 ps / 1 ps
 module intclock (
-		output wire  clkout, // clkout.clk
-		input  wire  oscena  // oscena.oscena
+		input  wire  inclk,  //  altclkctrl_input.inclk
+		output wire  outclk  // altclkctrl_output.outclk
 	);
 
-	altera_int_osc #(
-		.DEVICE_FAMILY   ("MAX 10"),
-		.DEVICE_ID       ("08"),
-		.CLOCK_FREQUENCY ("55")
-	) int_osc_0 (
-		.oscena (oscena), // oscena.oscena
-		.clkout (clkout)  // clkout.clk
+	intclock_altclkctrl_0 altclkctrl_0 (
+		.inclk  (inclk),  //  altclkctrl_input.inclk
+		.outclk (outclk)  // altclkctrl_output.outclk
 	);
 
 endmodule

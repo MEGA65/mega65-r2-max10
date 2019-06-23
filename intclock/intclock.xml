@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2019.06.23.11:24:42"
+ date="2019.06.23.11:49:56"
  outputDirectory="/home/paul/Projects/mega65/mega65-r2-max10/intclock/">
  <perimeter>
   <parameter
@@ -33,25 +33,28 @@
      defaultValue="8"
      onHdl="0"
      affectsHdl="1" />
-  <interface name="altclkctrl_input" kind="conduit" start="0">
-   <property name="associatedClock" value="" />
-   <property name="associatedReset" value="" />
-   <port name="inclk" direction="input" role="inclk" width="1" />
+  <interface name="clkout" kind="clock" start="1">
+   <property name="associatedDirectClock" value="" />
+   <property name="clockRate" value="0" />
+   <property name="clockRateKnown" value="false" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clkout" direction="output" role="clk" width="1" />
   </interface>
-  <interface name="altclkctrl_output" kind="conduit" start="0">
+  <interface name="oscena" kind="conduit" start="0">
    <property name="associatedClock" value="" />
    <property name="associatedReset" value="" />
-   <port name="outclk" direction="output" role="outclk" width="1" />
+   <port name="oscena" direction="input" role="oscena" width="1" />
   </interface>
  </perimeter>
  <entity
    path=""
-   parameterizationKey="intclock:1.0:AUTO_DEVICE=10M08SAU169C8G,AUTO_DEVICE_FAMILY=MAX 10,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1561281881,AUTO_UNIQUE_ID=(altclkctrl:18.1:CLOCK_TYPE=1,DEVICE_FAMILY=MAX 10,ENA_REGISTER_MODE=1,GUI_USE_ENA=false,NUMBER_OF_CLOCKS=1,USE_GLITCH_FREE_SWITCH_OVER_IMPLEMENTATION=false)"
+   parameterizationKey="intclock:1.0:AUTO_DEVICE=10M08SAU169C8G,AUTO_DEVICE_FAMILY=MAX 10,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1561283396,AUTO_UNIQUE_ID=(altera_int_osc:18.1:CBX_AUTO_BLACKBOX=ALL,CLOCK_FREQUENCY=55,CLOCK_FREQUENCY_1=55,CLOCK_FREQUENCY_2=77,DEVICE_FAMILY=MAX 10,DEVICE_ID=08,INFORMATION=The output frequency for 10M02, 10M04, 10M08, 10M16, and 10M25 devices is 55~116MHz &lt;br&gt;The output frequency for 10M40, and 10M50 devices is 35~77MHz &lt;br&gt;,PART_NAME=10M08SAU169C8G)"
    instancePathKey="intclock"
    kind="intclock"
    version="1.0"
    name="intclock">
-  <parameter name="AUTO_GENERATION_ID" value="1561281881" />
+  <parameter name="AUTO_GENERATION_ID" value="1561283396" />
   <parameter name="AUTO_DEVICE" value="10M08SAU169C8G" />
   <parameter name="AUTO_DEVICE_FAMILY" value="MAX 10" />
   <parameter name="AUTO_UNIQUE_ID" value="" />
@@ -63,8 +66,12 @@
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/intclock_altclkctrl_0.v"
+       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/altera_int_osc.v"
        type="VERILOG"
+       attributes="" />
+   <file
+       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/altera_int_osc.sdc"
+       type="SDC"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -72,7 +79,7 @@
   </sourceFiles>
   <childSourceFiles>
    <file
-       path="/opt/Quartus/18.1/ip/altera/megafunctions/altclkctrl/altclkctrl_hw.tcl" />
+       path="/opt/Quartus/18.1/ip/altera/altera_int_osc/altera_int_osc_hw.tcl" />
   </childSourceFiles>
   <messages>
    <message level="Debug" culprit="intclock">queue size: 0 starting:intclock "intclock"</message>
@@ -88,44 +95,50 @@
    <message level="Debug">Transform: InterruptFanoutTransform</message>
    <message level="Debug">Transform: AvalonStreamingTransform</message>
    <message level="Debug">Transform: ResetAdaptation</message>
-   <message level="Debug" culprit="intclock"><![CDATA["<b>intclock</b>" reuses <b>altclkctrl</b> "<b>submodules/intclock_altclkctrl_0</b>"]]></message>
-   <message level="Debug" culprit="intclock">queue size: 0 starting:altclkctrl "submodules/intclock_altclkctrl_0"</message>
-   <message level="Info" culprit="altclkctrl_0">Generating top-level entity intclock_altclkctrl_0.</message>
-   <message level="Debug" culprit="altclkctrl_0">Current quartus bindir: /opt/Quartus/18.1/quartus/linux64/.</message>
-   <message level="Info" culprit="altclkctrl_0"><![CDATA["<b>intclock</b>" instantiated <b>altclkctrl</b> "<b>altclkctrl_0</b>"]]></message>
+   <message level="Debug" culprit="intclock"><![CDATA["<b>intclock</b>" reuses <b>altera_int_osc</b> "<b>submodules/altera_int_osc</b>"]]></message>
+   <message level="Debug" culprit="intclock">queue size: 0 starting:altera_int_osc "submodules/altera_int_osc"</message>
+   <message level="Info" culprit="int_osc_0">Generating top-level entity altera_int_osc.</message>
+   <message level="Info" culprit="int_osc_0"><![CDATA["<b>intclock</b>" instantiated <b>altera_int_osc</b> "<b>int_osc_0</b>"]]></message>
   </messages>
  </entity>
  <entity
    path="submodules/"
-   parameterizationKey="altclkctrl:18.1:CLOCK_TYPE=1,DEVICE_FAMILY=MAX 10,ENA_REGISTER_MODE=1,GUI_USE_ENA=false,NUMBER_OF_CLOCKS=1,USE_GLITCH_FREE_SWITCH_OVER_IMPLEMENTATION=false"
-   instancePathKey="intclock:.:altclkctrl_0"
-   kind="altclkctrl"
+   parameterizationKey="altera_int_osc:18.1:CBX_AUTO_BLACKBOX=ALL,CLOCK_FREQUENCY=55,CLOCK_FREQUENCY_1=55,CLOCK_FREQUENCY_2=77,DEVICE_FAMILY=MAX 10,DEVICE_ID=08,INFORMATION=The output frequency for 10M02, 10M04, 10M08, 10M16, and 10M25 devices is 55~116MHz &lt;br&gt;The output frequency for 10M40, and 10M50 devices is 35~77MHz &lt;br&gt;,PART_NAME=10M08SAU169C8G"
+   instancePathKey="intclock:.:int_osc_0"
+   kind="altera_int_osc"
    version="18.1"
-   name="intclock_altclkctrl_0">
-  <parameter name="NUMBER_OF_CLOCKS" value="1" />
-  <parameter name="USE_GLITCH_FREE_SWITCH_OVER_IMPLEMENTATION" value="false" />
-  <parameter name="GUI_USE_ENA" value="false" />
+   name="altera_int_osc">
+  <parameter name="CLOCK_FREQUENCY_2" value="77" />
+  <parameter name="CLOCK_FREQUENCY_1" value="55" />
+  <parameter name="PART_NAME" value="10M08SAU169C8G" />
+  <parameter name="CLOCK_FREQUENCY" value="55" />
+  <parameter
+     name="INFORMATION"
+     value="The output frequency for 10M02, 10M04, 10M08, 10M16, and 10M25 devices is 55~116MHz &lt;br&gt;The output frequency for 10M40, and 10M50 devices is 35~77MHz &lt;br&gt;" />
   <parameter name="DEVICE_FAMILY" value="MAX 10" />
-  <parameter name="ENA_REGISTER_MODE" value="1" />
-  <parameter name="CLOCK_TYPE" value="1" />
+  <parameter name="CBX_AUTO_BLACKBOX" value="ALL" />
+  <parameter name="DEVICE_ID" value="08" />
   <generatedFiles>
    <file
-       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/intclock_altclkctrl_0.v"
+       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/altera_int_osc.v"
        type="VERILOG"
+       attributes="" />
+   <file
+       path="/home/paul/Projects/mega65/mega65-r2-max10/intclock/synthesis/submodules/altera_int_osc.sdc"
+       type="SDC"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles/>
   <sourceFiles>
    <file
-       path="/opt/Quartus/18.1/ip/altera/megafunctions/altclkctrl/altclkctrl_hw.tcl" />
+       path="/opt/Quartus/18.1/ip/altera/altera_int_osc/altera_int_osc_hw.tcl" />
   </sourceFiles>
   <childSourceFiles/>
-  <instantiator instantiator="intclock" as="altclkctrl_0" />
+  <instantiator instantiator="intclock" as="int_osc_0" />
   <messages>
-   <message level="Debug" culprit="intclock">queue size: 0 starting:altclkctrl "submodules/intclock_altclkctrl_0"</message>
-   <message level="Info" culprit="altclkctrl_0">Generating top-level entity intclock_altclkctrl_0.</message>
-   <message level="Debug" culprit="altclkctrl_0">Current quartus bindir: /opt/Quartus/18.1/quartus/linux64/.</message>
-   <message level="Info" culprit="altclkctrl_0"><![CDATA["<b>intclock</b>" instantiated <b>altclkctrl</b> "<b>altclkctrl_0</b>"]]></message>
+   <message level="Debug" culprit="intclock">queue size: 0 starting:altera_int_osc "submodules/altera_int_osc"</message>
+   <message level="Info" culprit="int_osc_0">Generating top-level entity altera_int_osc.</message>
+   <message level="Info" culprit="int_osc_0"><![CDATA["<b>intclock</b>" instantiated <b>altera_int_osc</b> "<b>int_osc_0</b>"]]></message>
   </messages>
  </entity>
 </deploy>
