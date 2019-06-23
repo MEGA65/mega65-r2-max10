@@ -99,10 +99,8 @@ begin
   
   
   -- Make UART loopback
-  -- XXX Initially test with simple loop-back,
-  -- then connect to Xilinx
-  te_uart_rx <= te_uart_tx;
-  dbg_uart_rx <= '1';
+  te_uart_rx <= dbg_uart_tx;
+  dbg_uart_rx <= te_uart_rx;
 
   -- Connect keyboard
   kb_tdo <= k_tdo;
@@ -121,6 +119,6 @@ begin
   fpga_tms <= te_tms;
 
   -- M65 reset button
-  fpga_reset_n <= reset_btn;
+  fpga_reset_n <= not reset_btn;
 		
 end architecture simple;
