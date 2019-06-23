@@ -103,21 +103,37 @@ begin
   te_uart_rx <= dbg_uart_tx;
 
   -- Connect keyboard
-  kb_tdo <= k_tdo;
-  k_tdi <= kb_tdi;
-  k_tck <= kb_tck;
-  k_tms <= kb_tms;
-  k_jtagen <= kb_jtagen;
+--  kb_tdo <= k_tdo;
+--  k_tdi <= kb_tdi;
+--  k_tck <= kb_tck;
+--  k_tms <= kb_tms;
+--  k_jtagen <= kb_jtagen;
   kb_io1 <= k_io1;
   kb_io2 <= k_io2;
   kb_io3 <= k_io3;
 
+  -- Connect keyboard to JTAG for now
+  k_jtagen <= '1';
+  k_tdi <= te_tdi;
+  k_tms <= te_tms;
+  k_tck <= te_tck;
+
   -- Connect Xilinx FPGA to JTAG interface
   fpga_tck <= te_tck;
-  te_tdo <= fpga_tdo;
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
+  
+  process (fpga_done,fpga_tdo,k_tdo) is
+  begin
+    if fpga_done='0' then
+      te_tdo <= fpga_tdo;
+    else
+      te_tdo <= k_tdo;
+    end if;
+  end process;
 
+  
+  
   -- M65 reset button
   fpga_reset_n <= not reset_btn;
 		

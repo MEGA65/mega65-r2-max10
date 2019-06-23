@@ -8,6 +8,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "dbg_uart_rx",
+					"strict" : false
+				},
+				{
 					"name" : "fpga_tck",
 					"strict" : false
 				},
@@ -21,10 +25,6 @@
 				},
 				{
 					"name" : "te_tdo",
-					"strict" : false
-				},
-				{
-					"name" : "kb_tdo",
 					"strict" : false
 				},
 				{
@@ -52,11 +52,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "k_jtagen",
+					"name" : "fpga_reset_n",
 					"strict" : false
 				},
 				{
-					"name" : "fpga_reset_n",
+					"name" : "dbg_uart_tx",
 					"strict" : false
 				},
 				{
@@ -76,11 +76,15 @@
 					"strict" : false
 				},
 				{
+					"name" : "k_tdo",
+					"strict" : false
+				},
+				{
 					"name" : "fpga_tdo",
 					"strict" : false
 				},
 				{
-					"name" : "k_tdo",
+					"name" : "fpga_done",
 					"strict" : false
 				},
 				{
@@ -93,22 +97,6 @@
 				},
 				{
 					"name" : "k_io3",
-					"strict" : false
-				},
-				{
-					"name" : "kb_tdi",
-					"strict" : false
-				},
-				{
-					"name" : "kb_tck",
-					"strict" : false
-				},
-				{
-					"name" : "kb_tms",
-					"strict" : false
-				},
-				{
-					"name" : "kb_jtagen",
 					"strict" : false
 				},
 				{
