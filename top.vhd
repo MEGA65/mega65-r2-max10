@@ -64,10 +64,10 @@ ENTITY top IS
     k_io2 : in std_logic;
     k_io3 : in std_logic;
     -- MAX10's own JTAG interface
-    m_tdo : out std_logic;
-    m_tdi : in std_logic;
-    m_tck : in std_logic;
-    m_tms : in std_logic;
+    altera_tdo : out std_logic;
+    altera_tdi : in std_logic;
+    altera_tck : in std_logic;
+    altera_tms : in std_logic;
         
     -----------------------------------------------------------------
     -- Reset button
@@ -121,17 +121,17 @@ begin
   begin
     if fpga_done='0' then
       -- Connect Xilinx FPGA to MAX10 JTAG interface
-      m_tdo <= fpga_tdo;
-      fpga_tck <= m_tck;
-      fpga_tdi <= m_tdi;
-      fpga_tms <= m_tms;
+      altera_tdo <= fpga_tdo;
+      fpga_tck <= altera_tck;
+      fpga_tdi <= altera_tdi;
+      fpga_tms <= altera_tms;
     else
       -- Connect keyboard to MAX10 JTAG
       k_jtagen <= '1';
-      m_tdo <= k_tdo;
-      k_tdi <= m_tdi;
-      k_tms <= m_tms;
-      k_tck <= m_tck;
+      altera_tdo <= k_tdo;
+      k_tdi <= altera_tdi;
+      k_tms <= altera_tms;
+      k_tck <= altera_tck;
     end if;
   end process;
 
