@@ -17,6 +17,14 @@ ENTITY top IS
     dbg_uart_rx : out std_logic;
 
     -----------------------------------------------------------------
+    -- Motherboard dip-switches
+    -----------------------------------------------------------------
+    cpld_cfg0 : in std_logic;
+    cpld_cfg1 : in std_logic;
+    cpld_cfg2 : in std_logic;
+    cpld_cfg3 : in std_logic;
+    
+    -----------------------------------------------------------------
     -- Xilinx FPGA JTAG interface
     -----------------------------------------------------------------
     -- FPGA pins
@@ -123,16 +131,14 @@ begin
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
   
-  process (fpga_done,fpga_tdo,k_tdo) is
+  process (cpld_cfg0,fpga_tdo,k_tdo) is
   begin
-    if fpga_done='0' then
+    if cpld_cfg0='0' then
       te_tdo <= fpga_tdo;
     else
       te_tdo <= k_tdo;
     end if;
-  end process;
-
-  
+  end process;  
   
   -- M65 reset button
   fpga_reset_n <= not reset_btn;
