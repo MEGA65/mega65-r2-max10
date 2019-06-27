@@ -6,6 +6,9 @@ use ieee.std_logic_unsigned.all;
 ENTITY top IS
   PORT (
 
+    LED_G : out std_logic;
+    LED_R : out std_logic;
+    
     -----------------------------------------------------------------
     -- M65 Serial monitor interface
     -----------------------------------------------------------------    
@@ -90,13 +93,16 @@ architecture simple of top is
 
   component intclock is
     port (
-      oscena : in  std_logic := 'X'; -- oscena
+      oscena : in  std_logic := '1'; -- oscena
       clkout : out std_logic         -- clk
       );
   end component intclock;
 
   signal clkout : std_logic := '0';
-
+  signal led : std_logic := '0';
+  
+  signal counter : integer := 0;
+  
 begin
 
   u0 : component intclock
@@ -105,7 +111,7 @@ begin
       clkout => clkout  -- clkout.clk
       );
   
-  
+
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
   te_uart_rx <= dbg_uart_tx;
@@ -120,12 +126,6 @@ begin
   kb_io2 <= k_io2;
   kb_io3 <= k_io3;
 
-  -- Connect keyboard to JTAG for now
-  k_jtagen <= '1';
-  k_tdi <= te_tdi;
-  k_tms <= te_tms;
-  k_tck <= te_tck;
-
   -- Connect Xilinx FPGA to JTAG interface
   fpga_tck <= te_tck;
   fpga_tdi <= te_tdi;
@@ -135,10 +135,39 @@ begin
   begin
     if cpld_cfg0='0' then
       te_tdo <= fpga_tdo;
+      -- And connect keyboard to Xilinx FPGA, and turn off JTAG mode for it
+      k_jtagen <= '0';
+      kb_tdo <= k_tdo;
+      k_tdi <= kb_tdi;
+      k_tck <= kb_tck;
+      k_tms <= kb_tms;
     else
+      -- Otherwise connect keyboard to JTAG
       te_tdo <= k_tdo;
+      k_jtagen <= '1';
+      k_tdi <= te_tdi;
+      k_tms <= te_tms;
+      k_tck <= te_tck;
+
     end if;
   end process;  
+
+  LED_G <= not kb_tck;
+
+  
+  process(clkout) is
+  begin
+    if rising_edge(clkout) then
+      if counter /= 1 then
+        counter <= counter + 1;
+      else
+        counter <= 0;
+        led <= not led;
+        LED_R <= not led;
+      end if;      
+    end if;
+  end process;
+  
   
   -- M65 reset button
   fpga_reset_n <= not reset_btn;
