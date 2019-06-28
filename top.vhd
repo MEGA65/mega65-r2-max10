@@ -51,7 +51,7 @@ ENTITY top IS
     -----------------------------------------------------------------
     -- 5V Power rail control
     -----------------------------------------------------------------
-    en_5v_joy_en : std_logic := '1';
+    en_5v_joy_n : out std_logic := '0';
 
     -----------------------------------------------------------------
     -- Keyboard connector
@@ -62,8 +62,8 @@ ENTITY top IS
     kb_tck : in std_logic;
     kb_tms : in std_logic;
     kb_jtagen : in std_logic;
-    kb_io1 : out std_logic;
-    kb_io2 : out std_logic;
+    kb_io1 : in std_logic;
+    kb_io2 : in std_logic;
     kb_io3 : out std_logic;
     -- pins connecting to actual keyboard
     k_tdo : in std_logic;
@@ -71,8 +71,8 @@ ENTITY top IS
     k_tck : out std_logic;
     k_tms : out std_logic;
     k_jtagen : out std_logic;
-    k_io1 : in std_logic;
-    k_io2 : in std_logic;
+    k_io1 : out std_logic;
+    k_io2 : out std_logic;
     k_io3 : in std_logic;
 
     -----------------------------------------------------------------
@@ -116,16 +116,8 @@ begin
   dbg_uart_rx <= te_uart_tx;
   te_uart_rx <= dbg_uart_tx;
 
-  -- Connect keyboard
---  kb_tdo <= k_tdo;
---  k_tdi <= kb_tdi;
---  k_tck <= kb_tck;
---  k_tms <= kb_tms;
---  k_jtagen <= kb_jtagen;
-  kb_io1 <= k_io1;
-  kb_io2 <= k_io2;
-  kb_io3 <= k_io3;
-
+  LED_G <= kb_io1;
+  
   -- Connect Xilinx FPGA to JTAG interface
   fpga_tck <= te_tck;
   fpga_tdi <= te_tdi;
@@ -141,6 +133,10 @@ begin
       k_tdi <= kb_tdi;
       k_tck <= kb_tck;
       k_tms <= kb_tms;
+      -- Connect keyboard GPIO interface
+      k_io1 <= kb_io1;
+      k_io2 <= kb_io2;
+      kb_io3 <= k_io3;      
     else
       -- Otherwise connect keyboard to JTAG
       te_tdo <= k_tdo;
@@ -152,13 +148,11 @@ begin
     end if;
   end process;  
 
-  LED_G <= not kb_tck;
-
   
   process(clkout) is
   begin
     if rising_edge(clkout) then
-      if counter /= 1 then
+      if counter /= 10000000 then
         counter <= counter + 1;
       else
         counter <= 0;
