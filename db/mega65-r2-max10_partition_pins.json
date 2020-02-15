@@ -4,6 +4,14 @@
 			"name" : "Top",
 			"pins" : [
 				{
+					"name" : "LED_G",
+					"strict" : false
+				},
+				{
+					"name" : "LED_R",
+					"strict" : false
+				},
+				{
 					"name" : "te_uart_rx",
 					"strict" : false
 				},
@@ -28,11 +36,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "kb_io1",
-					"strict" : false
-				},
-				{
-					"name" : "kb_io2",
+					"name" : "kb_tdo",
 					"strict" : false
 				},
 				{
@@ -52,7 +56,23 @@
 					"strict" : false
 				},
 				{
+					"name" : "k_jtagen",
+					"strict" : false
+				},
+				{
+					"name" : "k_io1",
+					"strict" : false
+				},
+				{
+					"name" : "k_io2",
+					"strict" : false
+				},
+				{
 					"name" : "fpga_reset_n",
+					"strict" : false
+				},
+				{
+					"name" : "kb_io1",
 					"strict" : false
 				},
 				{
@@ -84,15 +104,23 @@
 					"strict" : false
 				},
 				{
-					"name" : "fpga_done",
+					"name" : "cpld_cfg0",
 					"strict" : false
 				},
 				{
-					"name" : "k_io1",
+					"name" : "kb_tdi",
 					"strict" : false
 				},
 				{
-					"name" : "k_io2",
+					"name" : "kb_tck",
+					"strict" : false
+				},
+				{
+					"name" : "kb_tms",
+					"strict" : false
+				},
+				{
+					"name" : "reset_btn",
 					"strict" : false
 				},
 				{
@@ -100,7 +128,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "reset_btn",
+					"name" : "kb_io2",
 					"strict" : false
 				}
 			]

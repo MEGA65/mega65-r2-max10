@@ -79,6 +79,7 @@ ENTITY top IS
     -- Reset button
     -----------------------------------------------------------------
     reset_btn : in std_logic;
+    blue_wire : in std_logic;
     fpga_reset_n : out std_logic;
 
     -----------------------------------------------------------------
@@ -164,6 +165,6 @@ begin
   
   
   -- M65 reset button
-  fpga_reset_n <= not reset_btn;
+  fpga_reset_n <= not blue_wire;
 		
 end architecture simple;

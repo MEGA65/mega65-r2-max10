@@ -79,7 +79,7 @@ set_location_assignment PIN_L12 -to K_TDO
 set_location_assignment PIN_K12 -to K_IO2
 set_location_assignment PIN_J12 -to K_IO3
 set_location_assignment PIN_J9 -to FPGA_RESET_N
-set_location_assignment PIN_J13 -to 5V_JOY_PG
+set_location_assignment PIN_J13 -to BLUE_WIRE
 set_location_assignment PIN_H13 -to EN_5V_JOY_N
 set_location_assignment PIN_G12 -to FPGA_PROG_B
 set_location_assignment PIN_L13 -to K_IO1
