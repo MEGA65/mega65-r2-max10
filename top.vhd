@@ -15,10 +15,19 @@ ENTITY top IS
     -- UART pins on the JB1 JTAG connector
     te_uart_tx : in std_logic;
     te_uart_rx : out std_logic;
+
     -- The UART pins on the Xilinx FPGA
     dbg_uart_tx : in std_logic;
     dbg_uart_rx : out std_logic;
 
+    -----------------------------------------------------------------
+    -- MAX10 own debug UART interface
+    -----------------------------------------------------------------
+    -- (overloads external uSD card interface, so we have to tri-state
+    --  it).
+    m_tx : out std_logic := 'Z';
+    m_rx : in std_logic;
+    
     -----------------------------------------------------------------
     -- Motherboard dip-switches
     -----------------------------------------------------------------
@@ -26,6 +35,11 @@ ENTITY top IS
     cpld_cfg1 : in std_logic;
     cpld_cfg2 : in std_logic;
     cpld_cfg3 : in std_logic;
+
+    -----------------------------------------------------------------
+    -- J21 GPIO interface
+    -----------------------------------------------------------------
+    J21 : inout unsigned(11 downto 0) := (others => '0');
     
     -----------------------------------------------------------------
     -- Xilinx FPGA JTAG interface
@@ -46,8 +60,16 @@ ENTITY top IS
     -----------------------------------------------------------------
     fpga_prog_b : out std_logic := 'Z';
     fpga_init : out std_logic := 'Z';
-    fpga_done : in std_logic;
 
+    
+    -----------------------------------------------------------------
+    -- Xilinx FPGA communications channel
+    -----------------------------------------------------------------
+    fpga_done : in std_logic;    -- acts as clock
+    xilinx_sync : in std_logic;
+    xilinx_tx : in std_logic;
+    xilinx_rx : out std_logic := '1';
+    
     -----------------------------------------------------------------
     -- 5V Power rail control
     -----------------------------------------------------------------
@@ -80,7 +102,6 @@ ENTITY top IS
     -----------------------------------------------------------------
     reset_btn : in std_logic;
     blue_wire : in std_logic;
-    fpga_reset_n : out std_logic;
 
     -----------------------------------------------------------------
     -- VGA VDAC low-power switch
@@ -103,6 +124,13 @@ architecture simple of top is
   signal led : std_logic := '0';
   
   signal counter : integer := 0;
+  signal counter2 : integer := 0;
+  signal led_bright : integer := 0;
+  signal led_bright_dir : std_logic := '0';
+
+  signal xilinx_counter : integer range 0 to 31 := 0;
+  signal xilinx_vector_in : std_logic_vector(31 downto 0) := (others => '0');
+  signal xilinx_vector_out : std_logic_vector(31 downto 0) := (others => '0');
   
 begin
 
@@ -123,6 +151,39 @@ begin
   fpga_tck <= te_tck;
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
+
+  process (fpga_done) is
+  begin
+    if rising_edge(fpga_done) then
+      if xilinx_sync = '0' then
+        -- Sync: reset output vector, and apply input vector
+        xilinx_counter <= 0;
+        xilinx_vector_out(11 downto 0) <= j21;
+        xilinx_vector_out(12) <= cpld_cfg0;
+        xilinx_vector_out(13) <= cpld_cfg1;
+        xilinx_vector_out(14) <= cpld_cfg2;
+        xilinx_vector_out(15) <= cpld_cfg3;
+        xilinx_vector_out(16) <= not blue_wire; -- Reset button
+        xilinx_vector_out(31 downto 16) <= (others => '1');
+        for bit in 0 to 11 loop
+          if xilinx_vector_in(12+bit)='1' then
+            -- DDR = out
+            j21(bit) <= xilinx_vector_in(bit);
+          else
+            j21(bit) <= 'Z';
+          end if;
+        end loop;
+      else
+        xilinx_counter <= xilinx_counter + 1;
+      end if;
+      xilinx_vector_in(31) <= xilinx_rx;
+      xilinx_vector_in(30 downto 0) <= xilinx_vector_in(31 downto 1);
+      xilinx_tx <= xilinx_vector_out(31);
+      xilinx_vector_out(31 downto 1) <= xilinx_vector_out(30 downto 0);
+      
+    end if;
+  end process;
+  
   
   process (cpld_cfg0,fpga_tdo,k_tdo) is
   begin
@@ -153,18 +214,57 @@ begin
   process(clkout) is
   begin
     if rising_edge(clkout) then
-      if counter /= 10000000 then
+
+      -- Communications with the Xilinx FPGA is a bit "fun", because the internal
+      -- oscillator of the MAX10 can drift anywhere between 55MHz and 116MHz based
+      -- on temperature, voltage, phase of moon etc.
+      -- Also, we have only two wires between the two FPGAs for general communications.
+      -- FPGA_TX and FPGA_RX.  This means we don't have enough lines for TX and
+      -- RX and an explicit clock.
+      -- (Actually, we have JTAG and the MEGA65's serial monitor interface
+      -- passing through us as well, but those lines are more or less spoken for.)
+      -- What other options do we have?  We currently dedicate a line for the
+      -- reset button, which we could re-use.
+      -- We also have FPGA_DONE from the Xilinx FPGA, which the Xilinx FPGA can
+      -- control, and which we don't use for anything else.
+      -- Four lines is much nicer, as we can have CLK, SYNC, TX and RX, and thus
+      -- maximise our transfer rate, by not having to waste any cycles with sync
+      -- stuff.  It also lets us have the Xilinx FPGA provide the clock, so that
+      -- we don't have to worry about the MAX10 clock drifting.
+      -- The FPGA_DONE line can only be written to, so we can use that as the clock.
+      -- The RESET line, normally to the Xilinx, we can read, and if low, then
+      -- we treat it as a sync signal.  The Xilinx FPGA can modulate this at
+      -- its end.  Then the TX and RX lines can have their natural meanings.
+      
+      if counter /= 256 then
         counter <= counter + 1;
       else
         counter <= 0;
-        led <= not led;
-        LED_R <= not led;
-      end if;      
+        if led_bright /= 0 then
+          LED_R <= '0';
+        end if;
+      end if;
+      if counter = led_bright then
+        LED_R <= '1';
+      end if;
+      if counter2 /= 800000 then
+        counter2 <= counter2 + 1;
+      else
+        counter2 <= 0;
+        if led_bright = 63 then
+          led_bright <= 62;
+          led_bright_dir <= '1';
+        elsif led_bright = 0 then
+          led_bright <= 1;
+          led_bright_dir <= '0';
+        elsif led_bright_dir = '1' then
+          led_bright <= led_bright - 1;
+        else
+          led_bright <= led_bright + 1;
+        end if;
+      end if;
+      
     end if;
   end process;
-  
-  
-  -- M65 reset button
-  fpga_reset_n <= not blue_wire;
-		
+   		
 end architecture simple;

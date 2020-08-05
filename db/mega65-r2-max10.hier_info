@@ -5,6 +5,8 @@ te_uart_tx => dbg_uart_rx.DATAIN
 te_uart_rx <= dbg_uart_tx.DB_MAX_OUTPUT_PORT_TYPE
 dbg_uart_tx => te_uart_rx.DATAIN
 dbg_uart_rx <= te_uart_tx.DB_MAX_OUTPUT_PORT_TYPE
+m_tx <= comb.DB_MAX_OUTPUT_PORT_TYPE
+m_rx => ~NO_FANOUT~
 cpld_cfg0 => k_jtagen.DATAIN
 cpld_cfg0 => te_tdo.OUTPUTSELECT
 cpld_cfg0 => k_tdi.OUTPUTSELECT
@@ -50,8 +52,9 @@ k_jtagen <= cpld_cfg0.DB_MAX_OUTPUT_PORT_TYPE
 k_io1 <= k_io1$latch.DB_MAX_OUTPUT_PORT_TYPE
 k_io2 <= k_io2$latch.DB_MAX_OUTPUT_PORT_TYPE
 k_io3 => kb_io3$latch.DATAIN
-reset_btn => fpga_reset_n.DATAIN
-fpga_reset_n <= reset_btn.DB_MAX_OUTPUT_PORT_TYPE
+reset_btn => ~NO_FANOUT~
+blue_wire => fpga_reset_n.DATAIN
+fpga_reset_n <= blue_wire.DB_MAX_OUTPUT_PORT_TYPE
 vdac_psave_n <= <VCC>
 
 
