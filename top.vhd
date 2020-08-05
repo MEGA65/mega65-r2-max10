@@ -39,7 +39,7 @@ ENTITY top IS
     -----------------------------------------------------------------
     -- J21 GPIO interface
     -----------------------------------------------------------------
-    J21 : inout unsigned(11 downto 0) := (others => '0');
+    J21 : inout std_logic_vector(11 downto 0) := (others => '0');
     
     -----------------------------------------------------------------
     -- Xilinx FPGA JTAG interface
@@ -176,9 +176,9 @@ begin
       else
         xilinx_counter <= xilinx_counter + 1;
       end if;
-      xilinx_vector_in(31) <= xilinx_rx;
+      xilinx_vector_in(31) <= xilinx_tx;
       xilinx_vector_in(30 downto 0) <= xilinx_vector_in(31 downto 1);
-      xilinx_tx <= xilinx_vector_out(31);
+      xilinx_rx <= xilinx_vector_out(31);
       xilinx_vector_out(31 downto 1) <= xilinx_vector_out(30 downto 0);
       
     end if;
