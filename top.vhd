@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use work.version.all;
 
 ENTITY top IS
   PORT (
@@ -128,9 +129,16 @@ architecture simple of top is
   signal led_bright : integer := 0;
   signal led_bright_dir : std_logic := '0';
 
-  signal xilinx_counter : integer range 0 to 31 := 0;
-  signal xilinx_vector_in : std_logic_vector(31 downto 0) := (others => '0');
-  signal xilinx_vector_out : std_logic_vector(31 downto 0) := (others => '0');
+  signal xilinx_counter : integer range 0 to 63 := 0;
+  signal xilinx_vector_in : std_logic_vector(63 downto 0) := (others => '0');
+  signal xilinx_vector_out : std_logic_vector(63 downto 0) := (others => '0');
+
+  signal last_xilinx_sync : std_logic := '0';
+  signal sync_toggle : std_logic := '0';
+  signal last_sync_toggle : std_logic := '0';
+  signal sync_counter : integer range 0 to 7 := 0;
+
+  signal toggle : std_logic := '0';
   
 begin
 
@@ -139,32 +147,52 @@ begin
       oscena => '1', -- oscena.oscena
       clkout => clkout  -- clkout.clk
       );
-  
-
+    
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
   te_uart_rx <= dbg_uart_tx;
 
-  LED_G <= kb_io1;
+--  LED_G <= kb_io1;
   
   -- Connect Xilinx FPGA to JTAG interface
   fpga_tck <= te_tck;
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
 
-  process (fpga_done) is
+  process (xilinx_sync,clkout) is
   begin
-    if rising_edge(fpga_done) then
-      if xilinx_sync = '0' then
+    led_r <= xilinx_sync;
+
+    if rising_edge(clkout) then
+      if xilinx_sync = last_xilinx_sync then
+        if sync_counter < 4 then
+          sync_counter <= sync_counter + 1;
+        else
+          sync_toggle <= not sync_toggle;
+        end if;
+      else
+        sync_counter <= 0;
+      end if;
+      last_xilinx_sync <= xilinx_sync;
+      
+    end if;
+    
+    if rising_edge(xilinx_sync) then
+          
+      if sync_toggle /= last_sync_toggle then
+
+        last_sync_toggle <= sync_toggle;
         -- Sync: reset output vector, and apply input vector
         xilinx_counter <= 0;
-        xilinx_vector_out(11 downto 0) <= j21;
-        xilinx_vector_out(12) <= cpld_cfg0;
-        xilinx_vector_out(13) <= cpld_cfg1;
-        xilinx_vector_out(14) <= cpld_cfg2;
-        xilinx_vector_out(15) <= cpld_cfg3;
-        xilinx_vector_out(16) <= not blue_wire; -- Reset button
-        xilinx_vector_out(31 downto 16) <= (others => '1');
+        xilinx_rx <= j21(0);
+        xilinx_vector_out(10 downto 0) <= j21(11 downto 1);
+        xilinx_vector_out(11) <= cpld_cfg0;
+        xilinx_vector_out(12) <= cpld_cfg1;
+        xilinx_vector_out(13) <= cpld_cfg2;
+        xilinx_vector_out(14) <= cpld_cfg3;
+        xilinx_vector_out(15) <= blue_wire; -- Reset button
+        xilinx_vector_out(47 downto 16) <= std_logic_vector(fpga_commit);
+        xilinx_vector_out(62 downto 48) <= std_logic_vector(fpga_datestamp(14 downto 0));
         for bit in 0 to 11 loop
           if xilinx_vector_in(12+bit)='1' then
             -- DDR = out
@@ -175,11 +203,13 @@ begin
         end loop;
       else
         xilinx_counter <= xilinx_counter + 1;
+
+        xilinx_rx <= xilinx_vector_out(63);
+        led_g <= xilinx_vector_out(63);
+        xilinx_vector_out(63 downto 1) <= xilinx_vector_out(62 downto 0);        
       end if;
-      xilinx_vector_in(31) <= xilinx_tx;
-      xilinx_vector_in(30 downto 0) <= xilinx_vector_in(31 downto 1);
-      xilinx_rx <= xilinx_vector_out(31);
-      xilinx_vector_out(31 downto 1) <= xilinx_vector_out(30 downto 0);
+      xilinx_vector_in(63) <= xilinx_tx;
+      xilinx_vector_in(62 downto 0) <= xilinx_vector_in(63 downto 1);
       
     end if;
   end process;
@@ -241,11 +271,11 @@ begin
       else
         counter <= 0;
         if led_bright /= 0 then
-          LED_R <= '0';
+--          LED_R <= '0';
         end if;
       end if;
       if counter = led_bright then
-        LED_R <= '1';
+--        LED_R <= '1';
       end if;
       if counter2 /= 800000 then
         counter2 <= counter2 + 1;
