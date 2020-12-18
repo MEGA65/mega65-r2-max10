@@ -75,7 +75,7 @@ set_location_assignment PIN_F5 -to M_TDI
 set_location_assignment PIN_H6 -to CPLD_CLK
 set_location_assignment PIN_M1 -to HDMI_PD
 set_location_assignment PIN_N2 -to VDAC_PSAVE_N
-set_location_assignment PIN_K11 -to FPGA_TX
+set_location_assignment PIN_K11 -to XILINX_TX
 set_location_assignment PIN_L12 -to K_TDO
 set_location_assignment PIN_K12 -to K_IO2
 set_location_assignment PIN_J12 -to K_IO3
@@ -101,7 +101,7 @@ set_location_assignment PIN_M12 -to K_TCK
 set_location_assignment PIN_M13 -to K_TDI
 set_location_assignment PIN_N9 -to J21[3]
 set_location_assignment PIN_N10 -to J21[1]
-set_location_assignment PIN_L11 -to FPGA_RX
+set_location_assignment PIN_L11 -to XILINX_RX
 set_location_assignment PIN_M11 -to K_JTAGEN
 set_location_assignment PIN_K8 -to FPGA_TMS
 set_location_assignment PIN_L10 -to J21[0]
