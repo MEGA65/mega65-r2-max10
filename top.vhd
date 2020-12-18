@@ -165,9 +165,10 @@ begin
 
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
-        if sync_counter < 4 then
+        if sync_counter < 7 then
           sync_counter <= sync_counter + 1;
-        else
+        end if;
+        if sync_counter = 4 then
           sync_toggle <= not sync_toggle;
         end if;
       else
@@ -176,6 +177,8 @@ begin
       last_xilinx_sync <= xilinx_sync;
       
     end if;
+
+    led_g <= sync_toggle;
     
     if rising_edge(xilinx_sync) then
           
@@ -205,7 +208,7 @@ begin
         xilinx_counter <= xilinx_counter + 1;
 
         xilinx_rx <= xilinx_vector_out(63);
-        led_g <= xilinx_vector_out(63);
+--        led_g <= xilinx_vector_out(63);
         xilinx_vector_out(63 downto 1) <= xilinx_vector_out(62 downto 0);        
       end if;
       xilinx_vector_in(63) <= xilinx_tx;
