@@ -61,12 +61,11 @@ ENTITY top IS
     -----------------------------------------------------------------
     fpga_prog_b : out std_logic := 'Z';
     fpga_init : out std_logic := 'Z';
-
+    fpga_done : in std_logic;   
     
     -----------------------------------------------------------------
     -- Xilinx FPGA communications channel
     -----------------------------------------------------------------
-    fpga_done : in std_logic;    -- acts as clock
     xilinx_sync : in std_logic;
     xilinx_tx : in std_logic;
     xilinx_rx : out std_logic := '1';
@@ -129,9 +128,9 @@ architecture simple of top is
   signal led_bright : integer := 0;
   signal led_bright_dir : std_logic := '0';
 
-  signal xilinx_counter : integer range 0 to 63 := 0;
-  signal xilinx_vector_in : std_logic_vector(63 downto 0) := (others => '0');
-  signal xilinx_vector_out : std_logic_vector(63 downto 0) := (others => '0');
+  signal xilinx_counter : integer range 0 to 69 := 0;
+  signal xilinx_vector_in : std_logic_vector(69 downto 0) := (others => '0');
+  signal xilinx_vector_out : std_logic_vector(69 downto 0) := (others => '0');
 
   signal last_xilinx_sync : std_logic := '0';
   signal sync_toggle : std_logic := '0';
@@ -187,15 +186,37 @@ begin
         last_sync_toggle <= sync_toggle;
         -- Sync: reset output vector, and apply input vector
         xilinx_counter <= 0;
-        xilinx_rx <= j21(0);
-        xilinx_vector_out(10 downto 0) <= j21(11 downto 1);
-        xilinx_vector_out(11) <= cpld_cfg0;
-        xilinx_vector_out(12) <= cpld_cfg1;
-        xilinx_vector_out(13) <= cpld_cfg2;
-        xilinx_vector_out(14) <= cpld_cfg3;
-        xilinx_vector_out(15) <= blue_wire; -- Reset button
-        xilinx_vector_out(47 downto 16) <= std_logic_vector(fpga_commit);
-        xilinx_vector_out(62 downto 48) <= std_logic_vector(fpga_datestamp(14 downto 0));
+        xilinx_vector_out(16 downto 5) <= j21(11 downto 0);
+
+        -- receiving side seems to miss the first 6 bits or so?
+        xilinx_vector_out(17) <= not cpld_cfg0;
+        xilinx_vector_out(18) <= not cpld_cfg1;
+        xilinx_vector_out(19) <= not cpld_cfg2;
+        xilinx_vector_out(20) <= not cpld_cfg3;
+        xilinx_vector_out(21) <= not blue_wire; -- Reset button
+
+        -- Correct nybl order of commit so that it shows up nicely in memory on       
+        xilinx_vector_out(25 downto 22) <= std_logic_vector(fpga_commit(27 downto 24));
+        xilinx_vector_out(29 downto 26) <= std_logic_vector(fpga_commit(31 downto 28));
+        xilinx_vector_out(33 downto 30) <= std_logic_vector(fpga_commit(19 downto 16));
+        xilinx_vector_out(37 downto 34) <= std_logic_vector(fpga_commit(23 downto 20));
+        xilinx_vector_out(41 downto 38) <= std_logic_vector(fpga_commit(11 downto  8));
+        xilinx_vector_out(45 downto 42) <= std_logic_vector(fpga_commit(15 downto 12));
+        xilinx_vector_out(49 downto 46) <= std_logic_vector(fpga_commit( 3 downto  0));
+        xilinx_vector_out(53 downto 50) <= std_logic_vector(fpga_commit( 7 downto  4));
+        -- And also the datestamp, but the byte order is LSB first for 6502-style
+        xilinx_vector_out(57 downto 54) <= std_logic_vector(fpga_datestamp( 3 downto  0));
+        xilinx_vector_out(61 downto 58) <= std_logic_vector(fpga_datestamp( 7 downto  4));
+        xilinx_vector_out(65 downto 62) <= std_logic_vector(fpga_datestamp(11 downto  8));
+        xilinx_vector_out(69 downto 66) <= std_logic_vector(fpga_datestamp(15 downto 12));
+                                                                                                                        
+        -- Debug test value to get direction and orientation correct
+--        xilinx_vector_out <=
+--          "1011011101111011111011111101111111010010001000""01000001000000101010";
+        
+        -- XXX DEBUG make lots of the pins follow the reset button
+--        xilinx_vector_out <= (others => blue_wire);
+        
         for bit in 0 to 11 loop
           if xilinx_vector_in(12+bit)='1' then
             -- DDR = out
@@ -207,12 +228,12 @@ begin
       else
         xilinx_counter <= xilinx_counter + 1;
 
-        xilinx_rx <= xilinx_vector_out(63);
+        xilinx_rx <= xilinx_vector_out(67);
 --        led_g <= xilinx_vector_out(63);
-        xilinx_vector_out(63 downto 1) <= xilinx_vector_out(62 downto 0);        
+        xilinx_vector_out(69 downto 1) <= xilinx_vector_out(68 downto 0);        
       end if;
-      xilinx_vector_in(63) <= xilinx_tx;
-      xilinx_vector_in(62 downto 0) <= xilinx_vector_in(63 downto 1);
+      xilinx_vector_in(69) <= xilinx_tx;
+      xilinx_vector_in(68 downto 0) <= xilinx_vector_in(69 downto 1);
       
     end if;
   end process;
