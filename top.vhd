@@ -135,9 +135,10 @@ architecture simple of top is
   signal last_xilinx_sync : std_logic := '0';
   signal sync_toggle : std_logic := '0';
   signal last_sync_toggle : std_logic := '0';
-  signal sync_counter : integer range 0 to 7 := 0;
+  signal sync_counter : integer range 0 to 127 := 0;
 
   signal toggle : std_logic := '0';
+  signal old_protocol : std_logic := '0';
   
 begin
 
@@ -158,13 +159,15 @@ begin
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
 
-  process (xilinx_sync,clkout) is
+  process (xilinx_sync,clkout,old_protocol) is
+    variable xilinx_rx_old : std_logic := '1';
+    variable xilinx_rx_new : std_logic := '1';
   begin
     led_r <= xilinx_sync;
 
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
-        if sync_counter < 7 then
+        if sync_counter < 127 then
           sync_counter <= sync_counter + 1;
         end if;
         if sync_counter = 4 then
@@ -174,9 +177,24 @@ begin
         sync_counter <= 0;
       end if;
       last_xilinx_sync <= xilinx_sync;
+
+      if sync_counter = 127 then
+        old_protocol <= '1';
+      else
+        old_protocol <= '0';
+      end if;
+
+      -- Old protocol behaviour
+      xilinx_rx_old := not blue_wire;
       
     end if;
 
+    if old_protocol = '1' then
+      xilinx_rx <= xilinx_rx_old;
+    else
+      xilinx_rx <= xilinx_rx_new;
+    end if;
+    
     led_g <= sync_toggle;
     
     if rising_edge(xilinx_sync) then
@@ -228,7 +246,7 @@ begin
       else
         xilinx_counter <= xilinx_counter + 1;
 
-        xilinx_rx <= xilinx_vector_out(67);
+        xilinx_rx_new := xilinx_vector_out(67);
 --        led_g <= xilinx_vector_out(63);
         xilinx_vector_out(69 downto 1) <= xilinx_vector_out(68 downto 0);        
       end if;
