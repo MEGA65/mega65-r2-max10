@@ -75,9 +75,9 @@ set_location_assignment PIN_F5 -to M_TDI
 set_location_assignment PIN_H6 -to CPLD_CLK
 set_location_assignment PIN_M1 -to HDMI_PD
 set_location_assignment PIN_N2 -to VDAC_PSAVE_N
-set_location_assignment PIN_L11 -to XILINX_SYNC
+set_location_assignment PIN_K11 -to XILINX_SYNC
 set_location_assignment PIN_J9 -to XILINX_RX
-set_location_assignment PIN_K11 -to XILINX_TX
+set_location_assignment PIN_L11 -to XILINX_TX
 set_location_assignment PIN_L12 -to K_TDO
 set_location_assignment PIN_K12 -to K_IO2
 set_location_assignment PIN_J12 -to K_IO3
