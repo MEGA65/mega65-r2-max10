@@ -163,7 +163,6 @@ begin
     variable xilinx_rx_old : std_logic := '1';
     variable xilinx_rx_new : std_logic := '1';
   begin
-    led_r <= old_protocol;
 
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
@@ -178,11 +177,13 @@ begin
       end if;
       last_xilinx_sync <= xilinx_sync;
 
-      if sync_counter = 16363 then
-        old_protocol <= '1';
-      else
-        old_protocol <= '0';
-      end if;
+      -- Disable use of old protcol, since it is
+      -- now _very_ deprecated
+--      if sync_counter = 16363 then
+--        old_protocol <= '1';
+--      else
+--        old_protocol <= '0';
+--      end if;
 
       -- Old protocol behaviour
       xilinx_rx_old := not blue_wire;
@@ -313,11 +314,11 @@ begin
       else
         counter <= 0;
         if led_bright /= 0 then
---          LED_R <= '0';
+          LED_R <= '0';
         end if;
       end if;
       if counter = led_bright then
---        LED_R <= '1';
+        LED_R <= '1';
       end if;
       if counter2 /= 800000 then
         counter2 <= counter2 + 1;
