@@ -194,22 +194,22 @@ begin
 
       -- Disable use of old protcol, since it is
       -- now _very_ deprecated
---      if sync_counter = 16363 then
---        old_protocol <= '1';
---      else
---        old_protocol <= '0';
---      end if;
+      if sync_counter = 16363 then
+        old_protocol <= '1';
+      else
+        old_protocol <= '0';
+      end if;
 
       -- Old protocol behaviour
       xilinx_rx_old := not blue_wire;
       
     end if;
 
-    if old_protocol = '1' then
-      xilinx_rx <= xilinx_rx_old;
-    else
+--    if old_protocol = '1' then
+--      xilinx_rx <= xilinx_rx_old;
+--    else
       xilinx_rx <= xilinx_rx_new;
-    end if;
+--    end if;
     
     if rising_edge(xilinx_sync) then
           
