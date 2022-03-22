@@ -164,12 +164,27 @@ begin
     variable xilinx_rx_new : std_logic := '1';
   begin
 
+    -- Somewhere between 55MHz and 116MHz
+    -- The MEGA65 core will drive this line at
+    -- 40.5MHz, which means that we should see between
+    -- ~1.3x and ~3x the number of pulses
+    -- The counter on the MEGA65 counts to 79,
+    -- so the worst-case we should see is ~79x3 = ~240
+    -- We were using 127 as the limit previously, which
+    -- is clearly too low.
+    -- But even now with it set much, much higher than it
+    -- needs to be, subtle changes to the design (like changing
+    -- what we put on the LED!) are affecting whether the sync
+    -- pulse is correctly handled.
+    -- So let's think about what that sync pulse should look like.
+    -- ~3x is pretty close to 4x, so we should probably tighten the
+    -- tolerance for that.
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
         if sync_counter < 16383 then
           sync_counter <= sync_counter + 1;
         end if;
-        if sync_counter = 4 then
+        if sync_counter = 16 then
           sync_toggle <= not sync_toggle;
         end if;
       else
