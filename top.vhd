@@ -135,7 +135,7 @@ architecture simple of top is
   signal last_xilinx_sync : std_logic := '0';
   signal sync_toggle : std_logic := '0';
   signal last_sync_toggle : std_logic := '0';
-  signal sync_counter : integer range 0 to 127 := 0;
+  signal sync_counter : integer range 0 to 16383 := 0;
 
   signal toggle : std_logic := '0';
   signal old_protocol : std_logic := '0';
@@ -167,7 +167,7 @@ begin
 
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
-        if sync_counter < 127 then
+        if sync_counter < 16383 then
           sync_counter <= sync_counter + 1;
         end if;
         if sync_counter = 4 then
@@ -178,7 +178,7 @@ begin
       end if;
       last_xilinx_sync <= xilinx_sync;
 
-      if sync_counter = 127 then
+      if sync_counter = 16363 then
         old_protocol <= '1';
       else
         old_protocol <= '0';
