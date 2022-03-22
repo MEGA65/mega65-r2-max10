@@ -163,7 +163,7 @@ begin
     variable xilinx_rx_old : std_logic := '1';
     variable xilinx_rx_new : std_logic := '1';
   begin
-    led_r <= xilinx_sync;
+    led_r <= old_protocol;
 
     if rising_edge(clkout) then
       if xilinx_sync = last_xilinx_sync then
