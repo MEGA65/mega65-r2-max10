@@ -211,8 +211,6 @@ begin
       xilinx_rx <= xilinx_rx_new;
     end if;
     
-    led_g <= sync_toggle;
-    
     if rising_edge(xilinx_sync) then
           
       if sync_toggle /= last_sync_toggle then
@@ -330,11 +328,16 @@ begin
         counter <= 0;
         if led_bright /= 0 then
           LED_R <= '0';
-        end if;
+        end if;       
+        led_g <= old_protocol;
       end if;
       if counter = led_bright then
         LED_R <= '1';
       end if;
+      if counter = 32 then
+        led_g <= '1';
+      end if;
+      
       if counter2 /= 800000 then
         counter2 <= counter2 + 1;
       else
