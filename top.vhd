@@ -132,7 +132,9 @@ architecture simple of top is
   signal xilinx_vector_in : std_logic_vector(69 downto 0) := (others => '0');
   signal xilinx_vector_out : std_logic_vector(69 downto 0) := (others => '0');
 
-  signal last_xilinx_sync : std_logic := '0';
+  signal xilinx_half : std_logic := '0';
+  signal last_xilinx_half : std_logic := '0';
+ 
   signal sync_toggle : std_logic := '0';
   signal last_sync_toggle : std_logic := '0';
   signal sync_counter : integer range 0 to 16383 := 0;
@@ -179,18 +181,28 @@ begin
     -- So let's think about what that sync pulse should look like.
     -- ~3x is pretty close to 4x, so we should probably tighten the
     -- tolerance for that.
+    -- 16 cycles of 40.5MHz = 16 x ~25ns = ~400ns
+    -- At 55MHz, that will be 22 cycles.
+    -- At 116MHz, that will be 11 cycles.
+    -- So we must not use a sync delay >11.
+    -- 1 cycle at 40.5MHz should be 1.1 to 2.2 cycles, but as the
+    -- edges are not guaranteed to be aligned, odd effects may be
+    -- possible. Experience shows that 4 is too low.
+
+    led_g <= sync_toggle;
+    
     if rising_edge(clkout) then
-      if xilinx_sync = last_xilinx_sync then
+      if xilinx_half = last_xilinx_half then
         if sync_counter < 16383 then
           sync_counter <= sync_counter + 1;
         end if;
-        if sync_counter = 16 then
+        if sync_counter = 8 then
           sync_toggle <= not sync_toggle;
         end if;
       else
         sync_counter <= 0;
       end if;
-      last_xilinx_sync <= xilinx_sync;
+      last_xilinx_half <= xilinx_half;
 
       -- Disable use of old protcol, since it is
       -- now _very_ deprecated
@@ -212,7 +224,11 @@ begin
 --    end if;
     
     if rising_edge(xilinx_sync) then
-          
+      
+      -- Generate pulse train at 20.25Mhz, i.e., edges at 40.5MHz
+      -- from the 40.5Mhz clock from the Xilinx FPGA
+      xilinx_half <= not xilinx_half;
+      
       if sync_toggle /= last_sync_toggle then
 
         last_sync_toggle <= sync_toggle;
@@ -321,6 +337,8 @@ begin
       -- The RESET line, normally to the Xilinx, we can read, and if low, then
       -- we treat it as a sync signal.  The Xilinx FPGA can modulate this at
       -- its end.  Then the TX and RX lines can have their natural meanings.
+
+--      led_g <= old_protocol;
       
       if counter /= 256 then
         counter <= counter + 1;
@@ -329,13 +347,13 @@ begin
         if led_bright /= 0 then
           LED_R <= '0';
         end if;       
-        led_g <= old_protocol;
+--        led_g <= old_protocol;
       end if;
       if counter = led_bright then
         LED_R <= '1';
       end if;
       if counter = 32 then
-        led_g <= '1';
+--        led_g <= '1';
       end if;
       
       if counter2 /= 800000 then
