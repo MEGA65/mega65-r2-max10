@@ -196,7 +196,7 @@ begin
         if sync_counter < 16383 then
           sync_counter <= sync_counter + 1;
         end if;
-        if sync_counter = 8 then
+        if sync_counter = 16 then
           sync_toggle <= not sync_toggle;
         end if;
       else
