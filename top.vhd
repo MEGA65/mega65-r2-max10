@@ -9,6 +9,8 @@ ENTITY top IS
 
     LED_G : out std_logic;
     LED_R : out std_logic;
+
+    cpld_clk : in std_logic;
     
     -----------------------------------------------------------------
     -- M65 Serial monitor interface
@@ -144,11 +146,11 @@ architecture simple of top is
   
 begin
 
-  u0 : component intclock
-    port map (
-      oscena => '1', -- oscena.oscena
-      clkout => clkout  -- clkout.clk
-      );
+--  u0 : component intclock
+--    port map (
+--      oscena => '1', -- oscena.oscena
+--      clkout => clkout  -- clkout.clk
+--      );
     
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
@@ -189,7 +191,10 @@ begin
     -- edges are not guaranteed to be aligned, odd effects may be
     -- possible. Experience shows that 4 is too low.
 
-    led_g <= sync_toggle;
+--    led_g <= sync_toggle;
+    led_g <= cpld_clk;
+
+    clkout <= cpld_clk;
     
     if rising_edge(clkout) then
       if xilinx_half = last_xilinx_half then
