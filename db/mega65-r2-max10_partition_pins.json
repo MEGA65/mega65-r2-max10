@@ -36,6 +36,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "xilinx_rx",
+					"strict" : false
+				},
+				{
 					"name" : "kb_tdo",
 					"strict" : false
 				},
@@ -60,19 +64,59 @@
 					"strict" : false
 				},
 				{
-					"name" : "k_io1",
-					"strict" : false
-				},
-				{
 					"name" : "k_io2",
 					"strict" : false
 				},
 				{
-					"name" : "fpga_reset_n",
+					"name" : "J21[0]",
 					"strict" : false
 				},
 				{
-					"name" : "kb_io1",
+					"name" : "J21[1]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[2]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[3]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[4]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[5]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[6]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[7]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[8]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[9]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[10]",
+					"strict" : false
+				},
+				{
+					"name" : "J21[11]",
+					"strict" : false
+				},
+				{
+					"name" : "cpld_clk",
 					"strict" : false
 				},
 				{
@@ -120,7 +164,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "blue_wire",
+					"name" : "xilinx_sync",
 					"strict" : false
 				},
 				{
@@ -129,6 +173,26 @@
 				},
 				{
 					"name" : "kb_io2",
+					"strict" : false
+				},
+				{
+					"name" : "blue_wire",
+					"strict" : false
+				},
+				{
+					"name" : "cpld_cfg3",
+					"strict" : false
+				},
+				{
+					"name" : "cpld_cfg2",
+					"strict" : false
+				},
+				{
+					"name" : "xilinx_tx",
+					"strict" : false
+				},
+				{
+					"name" : "cpld_cfg1",
 					"strict" : false
 				}
 			]
