@@ -151,7 +151,10 @@ architecture tb of tb_top is
   
   signal LED_SHIFT    : std_logic;
   signal LED_CAPS    : std_logic;
-      
+
+  signal output_vector : std_logic_vector(127 downto 0);
+  signal keyboard_data : std_logic_vector(127 downto 0);
+  
     -----------------------------------------------------------------
     -- VGA VDAC low-power switch
     -----------------------------------------------------------------
@@ -342,6 +345,52 @@ begin
     while test_suite loop
 
       if run("MAX10 relays MK-I keyboard traffic to main FPGA") then
+        -- Either way, we expect valid MK-I keyboard traffic from the MAX10:
+        -- for MK-I keyboards it is transparently relayed. For MK-II keyboards
+        -- the MAX10 does the protocol conversion.
+        --
+        -- The protocol for MK-I keyboard is:
+        -- KIO8 = clock/sync from FPGA to keyboard
+        -- KIO9 = output from FPGA to keyboard
+        -- KIO10 = input from keyboard to FPGA
+        -- The protocol sends a 128 bit string in this way.
+        -- 24 bits of RGB for each of the four LEDs = 96 bits.
+        -- The remaining bits are reserved
+        -- Data is sent MSB first
+        -- For testing, we will set it to have 2 LEDs on, and 2 off, so that we
+        -- can check the reflected LED settings
+        -- Total sequence is 140 counts long, with 128 data ticks and a sync pulse
+        -- that lasts the rest of the duration
+        output_vector(127 downto 96) <= (others => '0');
+        -- Power LEDs
+        output_vector(95 downto 72) <= x"FFFFFF";
+        output_vector(71 downto 48) <= x"000000";
+        -- Floppy LEDs
+        output_vector(47 downto 24) <= x"ffffff";
+        output_vector(23 downto 0) <= x"000000";
+
+        for s in 1 to 2 loop
+          for i in 0 to 139 loop
+            if i < 128 then
+              -- Data bits
+              kio8 <= '0'; kio9 <= output_vector(127-i); wait for 12.34 ns;
+              kio8 <= '1'; wait for 12.34 ns;
+              keyboard_data(127-i) <= kio10;
+            else
+              -- Sync pulse
+              kio8 <= '1'; wait for 12.34 ns;
+              kio8 <= '1'; wait for 12.34 ns;              
+            end if;
+          end loop;
+        end loop;
+        report "Data from keyboard is " & to_hstring(keyboard_data);
+        report "LED status is: "
+          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
+          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
+          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
+          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          ;
+        
         assert false report "not implemented";
       end if;
     end loop;

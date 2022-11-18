@@ -48,23 +48,6 @@ END ENTITY keyboard_cpld;
 --
 ARCHITECTURE translated OF keyboard_cpld IS
   
-  --GENERIC (NOM_FREQ: string := "24.18");
-  
-  COMPONENT OSCH
-    -- synthesis translate_off
-    GENERIC (NOM_FREQ: string := "12.09");
-    -- synthesis translate_on
-    PORT ( STDBY :IN std_logic;
-           OSC :OUT std_logic;
-           SEDSTDBY :OUT std_logic);
-  END COMPONENT OSCH;
-
-  attribute NOM_FREQ : string;
-  
---attribute NOM_FREQ of OSCinst0 : label is "24.18";
-  attribute NOM_FREQ of OSCinst0 : label is "12.09";
-
-
   signal osc_clk: std_logic;
   signal clk: std_logic;
   signal cnt: unsigned(31 downto 0) := x"00000000";
@@ -108,16 +91,13 @@ ARCHITECTURE translated OF keyboard_cpld IS
   signal caps_lock_hold_time : integer  range 0 to (4*1048576-1) := 0;
   
 BEGIN
-  
-  clk <= osc_clk;
-  
-  OSCInst0: OSCH
-                                        -- synthesis translate_off
-    GENERIC MAP ( NOM_FREQ => "24.18" )
-    
-                                        -- synthesis translate_on
-    PORT MAP (STDBY=> '0', OSC=> osc_clk, SEDSTDBY=> open);
 
+  -- Generate 24MHz clock for simulating keyboard CPLD
+  process is
+  begin
+    clk <= '0'; wait for 20.8 ns; clk <= '1'; wait for 20.8 ns; 
+  end process;
+    
   process(clk)
   begin
     if (rising_edge(clk)) then
