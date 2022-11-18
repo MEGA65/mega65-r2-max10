@@ -36,12 +36,12 @@ architecture tb of tb_top is
   signal m_rx : std_logic;
     
     -----------------------------------------------------------------
-    -- Motherboard dip-switches
+    -- Motherboard dip-switches: All off by default
     -----------------------------------------------------------------
-  signal cpld_cfg0 : std_logic;
-  signal cpld_cfg1 : std_logic;
-  signal cpld_cfg2 : std_logic;
-  signal cpld_cfg3 : std_logic;
+  signal cpld_cfg0 : std_logic := '0';
+  signal cpld_cfg1 : std_logic := '0';
+  signal cpld_cfg2 : std_logic := '0';
+  signal cpld_cfg3 : std_logic := '0';
 
     -----------------------------------------------------------------
     -- J21 GPIO interface
@@ -109,13 +109,124 @@ architecture tb of tb_top is
   signal reset_btn : std_logic;
   signal blue_wire : std_logic;
 
+  signal SCAN_OUT    : std_logic_vector(9 downto 0);
+  signal SCAN_IN    : std_logic_vector(7 downto 0);
+  
+    -- A selection of keys to model
+  signal key_f    : std_logic := '1'; -- Column 2, row 5
+  signal key_o    : std_logic := '1'; -- Column 4, row 6,
+  signal key_RETURN    : std_logic := '1'; -- Column 0, row 1
+  signal key_UP    : std_logic := '1'; -- Colum 0, row 7 + Column 6, row 4 (RSHIFT)
+  signal key_DOWN    : std_logic := '1'; -- Column 0, row 7
+
+  signal mk1_KIO8    : std_logic;
+  signal mk1_KIO9    : std_logic;
+  signal mk1_KIO10    : std_logic;
+
+  signal mk2_KIO8    : std_logic;
+  signal mk2_KIO9    : std_logic;
+  signal mk2_KIO10    : std_logic;
+  
+  signal KIO8    : std_logic;
+  signal KIO9    : std_logic;
+  signal KIO10    : std_logic;
+    
+  signal KEY_RESTORE    : std_logic;
+  
+  signal LED_R0    : std_logic;
+  signal LED_G0    : std_logic;
+  signal LED_B0    : std_logic;
+  
+  signal LED_R1    : std_logic;
+  signal LED_G1    : std_logic;
+  signal LED_B1    : std_logic;
+  
+  signal LED_R2    : std_logic;
+  signal LED_G2    : std_logic;
+  signal LED_B2    : std_logic;
+  
+  signal LED_R3    : std_logic;
+  signal LED_G3    : std_logic;
+  signal LED_B3    : std_logic;
+  
+  signal LED_SHIFT    : std_logic;
+  signal LED_CAPS    : std_logic;
+      
     -----------------------------------------------------------------
     -- VGA VDAC low-power switch
     -----------------------------------------------------------------
   signal vdac_psave_n : std_logic := '1';
+
+  -- High if we are simulating a MK-I keyboard being connected,
+  -- or low if simulating a MK-II keyboard being connected.
+  signal mk1_connected : std_logic := '1';
   
 begin
 
+  -- Simulation can select which keyboard type is connected
+  process (mk1_connected) is
+  begin
+    if mk1_connected = '1' then
+      -- MK-I keyboard connected
+      mk1_KIO8 <= kb_io1;
+      mk1_KIO9 <= kb_io2;
+      kb_io3 <= mk1_KIO10;
+    else
+      -- MK-II keyboard connected
+      -- This is tricker, as we have to make two-way connection
+      -- for SDA (KIO8) at least.
+      -- XXX Not implemented
+      kb_io3 <= '0';
+    end if;
+  end process;
+    
+  
+  mk1_keyboard0: entity work.keyboard
+    port map (
+      SCAN_OUT => SCAN_OUT,
+      SCAN_IN => SCAN_IN,
+
+      -- A selection of keys to model
+      key_f => key_f ,
+      key_o => key_o ,
+      key_RETURN => key_RETURN ,
+      key_UP => key_UP ,
+      key_DOWN => key_DOWN 
+      
+      );
+  
+  mk1_cpld0: entity work.keyboard_cpld
+    port map (
+      KIO8 => mk1_KIO8 ,
+      KIO9 => mk1_KIO9 ,
+      KIO10 => mk1_KIO10 ,
+    
+      SCAN_OUT	=> SCAN_OUT,
+      SCAN_IN	=> SCAN_IN,
+    
+    
+      KEY_RESTORE => KEY_RESTORE,
+    
+      LED_R0           	=> LED_R0,
+      LED_G0           	=> LED_G0,
+      LED_B0           	=> LED_B0,
+   
+      LED_R1           	=> LED_R1,
+      LED_G1           	=> LED_G1,
+      LED_B1           	=> LED_B1,
+    
+      LED_R2           	=> LED_R2,
+      LED_G2           	=> LED_G2,
+      LED_B2           	=> LED_B2,
+    
+      LED_R3           	=> LED_R3,
+      LED_G3           	=> LED_G3,
+      LED_B3           	=> LED_B3,
+    
+      LED_SHIFT           => LED_SHIFT,
+      LED_CAPS            => LED_CAPS
+      );
+  
   top0: entity work.top
     port map (
 

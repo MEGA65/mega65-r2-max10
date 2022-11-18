@@ -140,14 +140,15 @@ architecture simple of top is
   
 begin
 
-  process (kio1_en, kio1_out) is
-  begin
-    if kio1_en='1' then
-      k_io1 <= kio1_out;
-    else
-      k_io1 <= 'Z';
-    end if;
-  end process;
+  -- XXX Use something like this for MK-II keyboard support
+--  process (kio1_en, kio1_out) is
+--  begin
+--    if kio1_en='1' then
+--      k_io1 <= kio1_out;
+--    else
+--      k_io1 <= 'Z';
+--    end if;
+--  end process;
   
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
@@ -300,7 +301,9 @@ begin
       k_tck <= kb_tck;
       k_tms <= kb_tms;
       -- Connect keyboard GPIO interface
---      k_io1 <= kb_io1;
+      -- XXX Disable direct connections as required once we add
+      -- support for MK-II keyboard
+      k_io1 <= kb_io1;
       k_io2 <= kb_io2;
       kb_io3 <= k_io3;      
     else
