@@ -1,7 +1,5 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
 use work.version.all;
 
 ENTITY top IS
@@ -45,7 +43,7 @@ ENTITY top IS
     J21 : inout std_logic_vector(11 downto 0) := (others => '0');
     
     -----------------------------------------------------------------
-    -- Xilinx FPGA JTAG interface
+   -- Xilinx FPGA JTAG interface
     -----------------------------------------------------------------
     -- FPGA pins
     fpga_tck : out std_logic;
@@ -95,7 +93,7 @@ ENTITY top IS
     k_tck : out std_logic;
     k_tms : out std_logic;
     k_jtagen : out std_logic;
-    k_io1 : out std_logic;
+    k_io1 : inout std_logic;
     k_io2 : out std_logic;
     k_io3 : in std_logic;
 
@@ -114,13 +112,6 @@ ENTITY top IS
 end entity top;	
 	
 architecture simple of top is
-
-  component intclock is
-    port (
-      oscena : in  std_logic := '1'; -- oscena
-      clkout : out std_logic         -- clk
-      );
-  end component intclock;
 
   signal clkout : std_logic := '0';
   signal led : std_logic := '0';
@@ -143,15 +134,21 @@ architecture simple of top is
 
   signal toggle : std_logic := '0';
   signal old_protocol : std_logic := '0';
+
+  signal kio1_en : std_logic := '0';
+  signal kio1_out : std_logic := '0';
   
 begin
 
---  u0 : component intclock
---    port map (
---      oscena => '1', -- oscena.oscena
---      clkout => clkout  -- clkout.clk
---      );
-    
+  process (kio1_en, kio1_out) is
+  begin
+    if kio1_en='1' then
+      k_io1 <= kio1_out;
+    else
+      k_io1 <= 'Z';
+    end if;
+  end process;
+  
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
   te_uart_rx <= dbg_uart_tx;
@@ -303,7 +300,7 @@ begin
       k_tck <= kb_tck;
       k_tms <= kb_tms;
       -- Connect keyboard GPIO interface
-      k_io1 <= kb_io1;
+--      k_io1 <= kb_io1;
       k_io2 <= kb_io2;
       kb_io3 <= k_io3;      
     else

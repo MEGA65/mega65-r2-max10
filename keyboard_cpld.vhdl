@@ -1,12 +1,9 @@
 --
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
-library machxo2;
-use machxo2.all;
-use work.version.all;
+use work.keyboard_cpld_version.all;
 
 ENTITY keyboard_cpld IS
   PORT (
