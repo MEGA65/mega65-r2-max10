@@ -153,7 +153,8 @@ begin
 							data_out <= registers(to_integer(selected_register_index));
                                                   accessed_reg <= to_integer(selected_register_index);
                                                   reg_read_strobe <= '1';
-                                                  report "Read from reg " & integer'image(to_integer(selected_register_index));
+                                                        report "Read from reg " & integer'image(to_integer(selected_register_index))
+                                                          & ", value = " & to_string(registers(to_integer(selected_register_index)));
 							state <= wait_for_event_released;
 						end if;
                                             when wait_for_event_released =>
