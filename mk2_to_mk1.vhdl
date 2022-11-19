@@ -32,7 +32,9 @@ architecture behavioural of mk2_to_mk1 is
   signal i2c_counter : integer range 0 to 125 := 0;
   signal i2c_tick : std_logic := '0';
   signal i2c_state : integer := 0;
-  signal addr : unsigned(2 downto 0) := to_unsigned(0,3);
+  -- Start with addr 5, so that we wrap to writing correct DDR values into addr
+  -- 0 IO expander for LED control
+  signal addr : unsigned(2 downto 0) := to_unsigned(5,3);
 
   signal i2c_bit : std_logic := '0';
   signal i2c_bit_valid : std_logic := '0';
@@ -282,9 +284,7 @@ begin  -- behavioural
       led_tick <= '0';
       if i2c_state = 0 then
         if to_integer(addr) < 5 then
---            addr <= addr + 1;
-          -- XXX DEBUG - just keep on the same expander
-          addr <= "101";
+          addr <= addr + 1;
           report "Reading I2C IO expander " & integer'image(to_integer(addr)+ 1);
           i2c_state <= 100;
         else
@@ -439,6 +439,7 @@ begin  -- behavioural
                       if u1_reg6='1' then
                         u1_reg6 <= '0';
                         u1_active <= '1';
+                        report "U1 is now configured for LED outputs";
                       end if;
                       
           -- State 100 = read inputs from an IO expander
