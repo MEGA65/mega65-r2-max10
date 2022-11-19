@@ -131,7 +131,7 @@ architecture tb of tb_top is
   signal KIO9    : std_logic;
   signal KIO10    : std_logic;
     
-  signal KEY_RESTORE    : std_logic;
+  signal KEY_RESTORE    : std_logic := '1';
   
   signal LED_R0    : std_logic;
   signal LED_G0    : std_logic;
@@ -167,19 +167,19 @@ architecture tb of tb_top is
 begin
 
   -- Simulation can select which keyboard type is connected
-  process (mk1_connected) is
+  process (mk1_connected,k_io1,k_io2,mk1_KIO10) is
   begin
     if mk1_connected = '1' then
       -- MK-I keyboard connected
-      mk1_KIO8 <= kb_io1;
-      mk1_KIO9 <= kb_io2;
-      kb_io3 <= mk1_KIO10;
+      mk1_KIO8 <= k_io1;
+      mk1_KIO9 <= k_io2;
+      k_io3 <= mk1_KIO10;
     else
       -- MK-II keyboard connected
       -- This is tricker, as we have to make two-way connection
       -- for SDA (KIO8) at least.
       -- XXX Not implemented
-      kb_io3 <= '0';
+      k_io3 <= '0';
     end if;
   end process;
     
@@ -197,8 +197,9 @@ begin
       key_DOWN => key_DOWN 
       
       );
-  
-  mk1_cpld0: entity work.keyboard_cpld
+
+  cpld0: if true generate
+    mk1_cpld0: entity work.keyboard_cpld
     port map (
       KIO8 => mk1_KIO8 ,
       KIO9 => mk1_KIO9 ,
@@ -229,6 +230,7 @@ begin
       LED_SHIFT           => LED_SHIFT,
       LED_CAPS            => LED_CAPS
       );
+  end generate;
   
   top0: entity work.top
     port map (
@@ -339,6 +341,15 @@ begin
       );
    
   main : process
+    function Reverse (x : std_logic_vector) return std_logic_vector is
+      alias alx : std_logic_vector (x'length - 1 downto 0) is x;
+      variable y : std_logic_vector (alx'range);
+    begin
+      for i in alx'range loop
+        y(i) := alx (alx'left - i);
+      end loop;
+      return y;
+    end;     
   begin
     test_runner_setup(runner, runner_cfg);
         
@@ -369,29 +380,52 @@ begin
         output_vector(47 downto 24) <= x"ffffff";
         output_vector(23 downto 0) <= x"000000";
 
+        -- Pretend to be Xilinx FPGA driving the process
+        -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
+        -- per clock phase
         for s in 1 to 2 loop
-          for i in 0 to 139 loop
+          report "cycle";
+          for i in 0 to 140 loop
             if i < 128 then
               -- Data bits
-              kio8 <= '0'; kio9 <= output_vector(127-i); wait for 12.34 ns;
-              kio8 <= '1'; wait for 12.34 ns;
-              keyboard_data(127-i) <= kio10;
+              kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
+              kb_io1 <= '1'; wait for 1580 ns;
+              keyboard_data(127-i) <= k_io3;
             else
-              -- Sync pulse
-              kio8 <= '1'; wait for 12.34 ns;
-              kio8 <= '1'; wait for 12.34 ns;              
+              kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
+              kb_io1 <= '1'; wait for 1580 ns;              
             end if;
           end loop;
         end loop;
         report "Data from keyboard is " & to_hstring(keyboard_data);
+        report "Data from keyboard is " & to_string(keyboard_data);
+        report "Keyboard GIT commit is " & to_hstring(Reverse(keyboard_data(33 downto 2)));
+        if Reverse(keyboard_data(33 downto 2)) /= x"12345678" then
+          assert false report "GIT commit should have been 12345678";
+        end if;
+        report "Keyboard GIT date is " & integer'image(to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))))
+          & " days after keyboard epoch";
+        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 9876 then
+          assert false report "GIT date should have been 9876";
+        end if;
         report "LED status is: "
           & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
           & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
           & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
           & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
           ;
-        
-        assert false report "not implemented";
+        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
+          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
+          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
+          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+          assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
+        end if;
+        for i in 127 downto 48 loop
+          if to_X01(keyboard_data(i)) /= '1' then
+            assert false report "all keys should be released, but matrix position " & integer'image(i-48)
+              & " was not high.";
+          end if;
+        end loop;
       end if;
     end loop;
     test_runner_cleanup(runner);

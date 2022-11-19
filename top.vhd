@@ -290,7 +290,7 @@ begin
   end process;
   
   
-  process (cpld_cfg0,fpga_tdo,k_tdo) is
+  process (cpld_cfg0,fpga_tdo,k_tdo,kb_io1,kb_io2,k_io3,te_tdi,te_tms,te_tck) is
   begin
     if cpld_cfg0='0' then
       te_tdo <= fpga_tdo;
@@ -303,6 +303,7 @@ begin
       -- Connect keyboard GPIO interface
       -- XXX Disable direct connections as required once we add
       -- support for MK-II keyboard
+--      report "Bridging Xilinx MK-I keyboard signals to keyboard";
       k_io1 <= kb_io1;
       k_io2 <= kb_io2;
       kb_io3 <= k_io3;      

@@ -19,37 +19,36 @@ ENTITY keyboard_cpld IS
     KIO9 : in std_logic := '0';
     KIO10 : out std_logic := '0';
     
-    SCAN_OUT			: OUT std_logic_vector(9 downto 0);
+    SCAN_OUT			: OUT std_logic_vector(9 downto 0) := (others => '1');
     SCAN_IN		    	: IN std_logic_vector(7 downto 0);
     
     
     KEY_RESTORE	    	: IN std_logic;
     
-    LED_R0           	: OUT std_logic;
-    LED_G0           	: OUT std_logic;
-    LED_B0           	: OUT std_logic;
+    LED_R0           	: OUT std_logic := '0';
+    LED_G0           	: OUT std_logic := '0';
+    LED_B0           	: OUT std_logic := '0';
    
-    LED_R1           	: OUT std_logic;
-    LED_G1           	: OUT std_logic;
-    LED_B1           	: OUT std_logic;
+    LED_R1           	: OUT std_logic := '0';
+    LED_G1           	: OUT std_logic := '0';
+    LED_B1           	: OUT std_logic := '0';
     
-    LED_R2           	: OUT std_logic;
-    LED_G2           	: OUT std_logic;
-    LED_B2           	: OUT std_logic;
+    LED_R2           	: OUT std_logic := '0';
+    LED_G2           	: OUT std_logic := '0';
+    LED_B2           	: OUT std_logic := '0';
     
-    LED_R3           	: OUT std_logic;
-    LED_G3           	: OUT std_logic;
-    LED_B3           	: OUT std_logic;
+    LED_R3           	: OUT std_logic := '0';
+    LED_G3           	: OUT std_logic := '0';
+    LED_B3           	: OUT std_logic := '0';
     
-    LED_SHIFT           : OUT std_logic;
-    LED_CAPS            : OUT std_logic
+    LED_SHIFT           : OUT std_logic := '0';
+    LED_CAPS            : OUT std_logic := '0'
     );
 END ENTITY keyboard_cpld;
 --
 ARCHITECTURE translated OF keyboard_cpld IS
   
-  signal osc_clk: std_logic;
-  signal clk: std_logic;
+  signal clk: std_logic := '0';
   signal cnt: unsigned(31 downto 0) := x"00000000";
   signal cnt_idle: unsigned(31 downto 0) := x"00000000";
   
@@ -63,14 +62,14 @@ ARCHITECTURE translated OF keyboard_cpld IS
   signal scan_phase : integer range 0 to 15 := 0;
   signal scan_out_internal : std_logic_vector(9 downto 0) := "0000000001";
   -- 0 = key down, 1 = key not pressed
-  signal mega65_ordered_matrix : unsigned(81 downto 0);
+  signal mega65_ordered_matrix : unsigned(81 downto 0) := (others => '0');
 
   -- Track state of shift lock and caps lock keys locally
   -- (Again, 1 = not active, 0 = active)
   signal caps_lock : std_logic := '0';
   signal shift_lock  : std_logic := '0';
-  signal last_caps_lock : std_logic_vector(7 downto 0);
-  signal last_shift_lock  : std_logic_vector(7 downto 0);
+  signal last_caps_lock : std_logic_vector(7 downto 0) := (others => '0');
+  signal last_shift_lock  : std_logic_vector(7 downto 0) := (others => '0');
 
   -- Info we read from the MEGA65.
   -- 4x RGB leds with 8-bit brightness for each channel.
@@ -79,7 +78,7 @@ ARCHITECTURE translated OF keyboard_cpld IS
   -- We'll make it 128 bits for simplicity, and a bit of expansion.
   -- (The caps lock and shift lock LEDs are driven locally by us, so we don't
   -- need to have data for those.)
-  signal mega65_control_data : unsigned(127 downto 0);
+  signal mega65_control_data : unsigned(127 downto 0) := (others => '0');
 
   signal loop_count : unsigned(7 downto 0) := x"00";  
 
@@ -95,7 +94,8 @@ BEGIN
   -- Generate 24MHz clock for simulating keyboard CPLD
   process is
   begin
-    clk <= '0'; wait for 20.8 ns; clk <= '1'; wait for 20.8 ns; 
+--    clk <= '0'; wait for 20.8 ns; clk <= '1'; wait for 20.8 ns;
+    clk <= '0'; wait for 41.6 ns; clk <= '1'; wait for 41.6 ns;
   end process;
     
   process(clk)
@@ -147,9 +147,15 @@ BEGIN
       
       if KIO8='0' then
         clock_duration <= 0;
+        if clock_duration /= 0 then
+          report "Saw half clock of duration " & integer'image(clock_duration);
+        end if;
       else
         if clock_duration < 31 then
           clock_duration <= clock_duration + 1;
+        end if;
+        if clock_duration = 30 then
+          report "Saw start of 31+ cycle long sync pulse";
         end if;
       end if;
       
@@ -165,8 +171,10 @@ BEGIN
         end loop;
         bit_number <= 0;
         KIO10 <= '1';
+        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
       else
         if last_last_KIO8 = '0' and last_KIO8 = '1' then
+          report "CLK from Xilinx rose";
          -- Latch data on rising edge
           if bit_number /= 255 then
             bit_number <= bit_number + 1;
@@ -186,6 +194,7 @@ BEGIN
           serial_data_out(127 downto 1) <= serial_data_out(126 downto 0);
           serial_data_out(0) <= serial_data_out(127);
           KIO10 <= serial_data_out(125);
+          report "keyboard CPLD outputting bit " & std_logic'image(serial_data_out(125));
         end if;
       end if;
 
