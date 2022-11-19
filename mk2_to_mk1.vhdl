@@ -166,6 +166,7 @@ begin  -- behavioural
         for i in 0 to 31 loop
           serial_data_out(1+i) <= mk2_id_commit(24 - ((i / 8)*8) + 7 - (i mod 8));
         end loop;
+        serial_data_out(127 downto 48) <= export_keys;
         bit_number <= 0;
         mk2_xil_io3 <= '1';
 --        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
