@@ -64,7 +64,63 @@
 					"strict" : false
 				},
 				{
-					"name" : "k_io2",
+					"name" : "k_io1_en",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_R0",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_G0",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_B0",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_R1",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_G1",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_B1",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_R2",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_G2",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_B2",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_R3",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_G3",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_B3",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_SHIFT",
+					"strict" : false
+				},
+				{
+					"name" : "mk2_LED_CAPS",
 					"strict" : false
 				},
 				{
@@ -116,7 +172,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "cpld_clk",
+					"name" : "k_io1",
+					"strict" : false
+				},
+				{
+					"name" : "k_io2",
 					"strict" : false
 				},
 				{
@@ -140,6 +200,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "cpld_clk",
+					"strict" : false
+				},
+				{
 					"name" : "k_tdo",
 					"strict" : false
 				},
@@ -149,6 +213,14 @@
 				},
 				{
 					"name" : "cpld_cfg0",
+					"strict" : false
+				},
+				{
+					"name" : "xilinx_sync",
+					"strict" : false
+				},
+				{
+					"name" : "k_io3",
 					"strict" : false
 				},
 				{
@@ -164,11 +236,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "xilinx_sync",
-					"strict" : false
-				},
-				{
-					"name" : "k_io3",
+					"name" : "kb_io1",
 					"strict" : false
 				},
 				{

@@ -236,7 +236,8 @@ begin
 
     -- We are now using the fixed crystal CPLD_CLK at 100MHz
 
-    led_g <= clock50;
+    -- Dim green LED if MK-I keyboard attached, or off for MK-II keyboard
+    led_g <= mk1_connected and clock50;
 
     clkout <= clock50;
     
