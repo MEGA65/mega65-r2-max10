@@ -94,7 +94,7 @@ ENTITY top IS
     k_tms : out std_logic;
     k_jtagen : out std_logic;
     k_io1 : inout std_logic;
-    k_io2 : out std_logic;
+    k_io2 : inout std_logic;
     k_io1_en : out std_logic;
     k_io2_en : out std_logic;
     k_io3 : in std_logic;

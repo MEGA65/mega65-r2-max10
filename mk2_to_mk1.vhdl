@@ -189,7 +189,7 @@ begin  -- behavioural
             output_vector(95) <= mk2_xil_io2;
             v(95 downto 1) := unsigned(serial_data_in(94 downto 0));
             v(0) := mk2_xil_io2;
-            report "Setting output_vector to $" & string'(to_hstring(unsigned'(v)));
+            report "Setting output_vector to $" & string'(to_hexstring(unsigned'(v)));
           end if;
 
           -- And push matrix data out
