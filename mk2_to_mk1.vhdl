@@ -161,12 +161,14 @@ begin  -- behavioural
         serial_data_out(127 downto 46) <= mega65_ordered_matrix;
         -- We send bits in reverse order, so put date and version in backwards
         for i in 0 to 13 loop
-          serial_data_out(33 + i) <= mk2_id_date(13 - i);
+          serial_data_out(32 + i) <= mk2_id_date(13 - i);
         end loop;
         for i in 0 to 31 loop
-          serial_data_out(1+i) <= mk2_id_commit(24 - ((i / 8)*8) + 7 - (i mod 8));
+          serial_data_out(i) <= mk2_id_commit(24 - ((i / 8)*8) + 7 - (i mod 8));
         end loop;
-        serial_data_out(127 downto 48) <= export_keys;
+        for i in 0 to 79 loop
+          serial_data_out(48 + i) <= export_keys(79 - i);
+        end loop;
         bit_number <= 0;
         mk2_xil_io3 <= '1';
 --        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
@@ -315,6 +317,7 @@ begin  -- behavioural
             end case;
 
           when "100" => -- U4
+            report "i2c bit #" & integer'image(i2c_bit_num) & " = " & std_logic'image(i2c_bit);
             case i2c_bit_num is
               when 0 => current_keys(47) <= i2c_bit;-- <
               when 1 => current_keys(44) <= i2c_bit;-- >
@@ -406,6 +409,7 @@ begin  -- behavioural
           led_tick <= '1';
           report "Writing to I2C IO expander " & integer'image(0);
           -- We have read all IO expanders, so update exported key states
+          report "Updating current key vector to " & to_string(current_keys);
           export_keys <= current_keys;
           current_keys <= (others => '1');
           -- Update LEDs
@@ -664,21 +668,21 @@ begin  -- behavioural
                       
           -- Read 2 bytes of data
           when 190 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 191 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 7; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 191 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 7; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 192 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 193 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 6; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 193 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 6; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 194 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 195 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 5; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 195 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 5; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 196 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 197 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 4; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 197 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 4; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 198 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 199 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 3; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 199 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 3; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 200 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 201 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 2; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 201 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 2; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 202 => mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 203 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 1; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 203 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 1; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 204 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
-          when 205 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 0; mk2_io2 <= '0'; mk2_io2_en <= '1';   -- ack byte read
+          when 205 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 0; mk2_io2 <= '0'; mk2_io2_en <= '1';   -- ack byte read
                       -- Now we need to release SDA immediately, rather than
                       -- waiting 1 bit time, but only after we have pulled
                       -- SCL low.
@@ -687,21 +691,21 @@ begin  -- behavioural
                       
           when 207 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 208 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
-          when 209 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 15; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 209 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 15; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 210 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 211 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 14; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 211 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 14; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 212 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 213 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 13; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 213 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 13; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 214 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 215 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 12; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 215 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 12; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 216 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 217 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 11; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 217 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 11; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 218 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 219 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 10; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 219 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 10; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 220 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 221 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 9; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 221 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 9; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 222 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0'; -- don't ack last byte read
-          when 223 => i2c_bit <= mk2_io1; i2c_bit_valid <= '1'; i2c_bit_num <= 8; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; 
+          when 223 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 8; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; 
           when 224 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '1';
                       
           -- Send STOP at end of read
