@@ -127,7 +127,7 @@ architecture tb of tb_top is
 
   signal mk2_KIO8    : std_logic;
   signal mk2_KIO9    : std_logic;
-  signal mk2_KIO10    : std_logic;
+  signal mk2_KIO10    : std_logic := '0';
   
   signal KIO8    : std_logic;
   signal KIO9    : std_logic;
@@ -172,7 +172,7 @@ begin
   process (mk1_connected,k_io1,k_io2,mk1_KIO10) is
   begin
     if mk1_connected = '1' then
-      report "MK-I connected";
+--      report "MK-I connected";
       -- MK-I keyboard connected
       mk1_KIO8 <= k_io1;
       mk1_KIO9 <= k_io2;
@@ -181,12 +181,14 @@ begin
         report "KIO10 = 0";
       end if;
     else
-      report "MK-II connected";
+--      report "MK-II connected";
       -- MK-II keyboard connected
       -- This is tricker, as we have to make two-way connection
       -- for SDA (KIO8) at least.
       -- XXX Not implemented
-      k_io3 <= '0';
+      mk2_KIO8 <= k_io1;
+      mk2_KIO9 <= k_io2;
+      k_io3 <= mk2_KIO10;
     end if;
   end process;
     
@@ -405,7 +407,7 @@ begin
               -- Data bits
               kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
               kb_io1 <= '1'; wait for 1580 ns;
-              keyboard_data(127-i) <= k_io3;
+              keyboard_data(127-i) <= kb_io3;
             else
               kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
               kb_io1 <= '1'; wait for 1580 ns;              
@@ -479,7 +481,7 @@ begin
               -- Data bits
               kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
               kb_io1 <= '1'; wait for 1580 ns;
-              keyboard_data(127-i) <= k_io3;
+              keyboard_data(127-i) <= kb_io3;
             else
               kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
               kb_io1 <= '1'; wait for 1580 ns;              
@@ -544,7 +546,7 @@ begin
               -- Data bits
               kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
               kb_io1 <= '1'; wait for 1580 ns;
-              keyboard_data(127-i) <= k_io3;
+              keyboard_data(127-i) <= kb_io3;
             else
               kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
               kb_io1 <= '1'; wait for 1580 ns;              
@@ -620,7 +622,7 @@ begin
               -- Data bits
               kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
               kb_io1 <= '1'; wait for 1580 ns;
-              keyboard_data(127-i) <= k_io3;
+              keyboard_data(127-i) <= kb_io3;
             else
               kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
               kb_io1 <= '1'; wait for 1580 ns;              

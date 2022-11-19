@@ -344,7 +344,6 @@ begin
       mk2_xil_io1 <= kb_io1;
       mk2_xil_io2 <= kb_io2;
       kb_io3 <= mk2_xil_io3;
-      report "exporting MK-II bit " & std_logic'image(mk2_xil_io3);
     else
       -- Otherwise connect keyboard to JTAG
       te_tdo <= k_tdo;
