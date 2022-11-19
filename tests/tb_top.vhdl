@@ -135,25 +135,36 @@ architecture tb of tb_top is
     
   signal KEY_RESTORE    : std_logic := '1';
   
-  signal LED_R0    : std_logic;
-  signal LED_G0    : std_logic;
-  signal LED_B0    : std_logic;
-  
-  signal LED_R1    : std_logic;
-  signal LED_G1    : std_logic;
-  signal LED_B1    : std_logic;
-  
-  signal LED_R2    : std_logic;
-  signal LED_G2    : std_logic;
-  signal LED_B2    : std_logic;
-  
-  signal LED_R3    : std_logic;
-  signal LED_G3    : std_logic;
-  signal LED_B3    : std_logic;
-  
-  signal LED_SHIFT    : std_logic;
-  signal LED_CAPS    : std_logic;
+  signal mk1_LED_R0    : std_logic;
+  signal mk1_LED_G0    : std_logic;
+  signal mk1_LED_B0    : std_logic;
+  signal mk1_LED_R1    : std_logic;
+  signal mk1_LED_G1    : std_logic;
+  signal mk1_LED_B1    : std_logic;
+  signal mk1_LED_R2    : std_logic;
+  signal mk1_LED_G2    : std_logic;
+  signal mk1_LED_B2    : std_logic;
+  signal mk1_LED_R3    : std_logic;
+  signal mk1_LED_G3    : std_logic;
+  signal mk1_LED_B3    : std_logic;
+  signal mk1_LED_SHIFT    : std_logic;
+  signal mk1_LED_CAPS    : std_logic;
 
+  signal mk2_LED_R0    : std_logic;
+  signal mk2_LED_G0    : std_logic;
+  signal mk2_LED_B0    : std_logic;
+  signal mk2_LED_R1    : std_logic;
+  signal mk2_LED_G1    : std_logic;
+  signal mk2_LED_B1    : std_logic;
+  signal mk2_LED_R2    : std_logic;
+  signal mk2_LED_G2    : std_logic;
+  signal mk2_LED_B2    : std_logic;
+  signal mk2_LED_R3    : std_logic;
+  signal mk2_LED_G3    : std_logic;
+  signal mk2_LED_B3    : std_logic;
+  signal mk2_LED_SHIFT    : std_logic;
+  signal mk2_LED_CAPS    : std_logic;
+  
   signal output_vector : std_logic_vector(127 downto 0);
   signal keyboard_data : std_logic_vector(127 downto 0);
   
@@ -222,24 +233,24 @@ begin
     
       KEY_RESTORE => KEY_RESTORE,
     
-      LED_R0           	=> LED_R0,
-      LED_G0           	=> LED_G0,
-      LED_B0           	=> LED_B0,
+      LED_R0           	=> mk1_LED_R0,
+      LED_G0           	=> mk1_LED_G0,
+      LED_B0           	=> mk1_LED_B0,
    
-      LED_R1           	=> LED_R1,
-      LED_G1           	=> LED_G1,
-      LED_B1           	=> LED_B1,
+      LED_R1           	=> mk1_LED_R1,
+      LED_G1           	=> mk1_LED_G1,
+      LED_B1           	=> mk1_LED_B1,
     
-      LED_R2           	=> LED_R2,
-      LED_G2           	=> LED_G2,
-      LED_B2           	=> LED_B2,
+      LED_R2           	=> mk1_LED_R2,
+      LED_G2           	=> mk1_LED_G2,
+      LED_B2           	=> mk1_LED_B2,
     
-      LED_R3           	=> LED_R3,
-      LED_G3           	=> LED_G3,
-      LED_B3           	=> LED_B3,
+      LED_R3           	=> mk1_LED_R3,
+      LED_G3           	=> mk1_LED_G3,
+      LED_B3           	=> mk1_LED_B3,
     
-      LED_SHIFT           => LED_SHIFT,
-      LED_CAPS            => LED_CAPS
+      LED_SHIFT           => mk1_LED_SHIFT,
+      LED_CAPS            => mk1_LED_CAPS
       );
   end generate;
   
@@ -347,7 +358,26 @@ begin
     -----------------------------------------------------------------
     -- VGA VDAC low-power switch
     -----------------------------------------------------------------
-      vdac_psave_n => vdac_psave_n
+      vdac_psave_n => vdac_psave_n,
+
+      mk2_LED_R0 => mk2_LED_R0,
+      mk2_LED_G0 => mk2_LED_G0,
+      mk2_LED_B0 => mk2_LED_B0,
+   
+      mk2_LED_R1 => mk2_LED_R1,
+      mk2_LED_G1 => mk2_LED_G1,
+      mk2_LED_B1 => mk2_LED_B1,
+    
+      mk2_LED_R2 => mk2_LED_R2,
+      mk2_LED_G2 => mk2_LED_G2,
+      mk2_LED_B2 => mk2_LED_B2,
+    
+      mk2_LED_R3 => mk2_LED_R3,
+      mk2_LED_G3 => mk2_LED_G3,
+      mk2_LED_B3 => mk2_LED_B3,
+    
+      mk2_LED_SHIFT => mk2_LED_SHIFT,
+      mk2_LED_CAPS => mk2_LED_CAPS
     
       );
 
@@ -426,15 +456,15 @@ begin
           assert false report "GIT date should have been 9876";
         end if;
         report "LED status is: "
-          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
-          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
-          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
-          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          & std_logic'image(mk1_LED_R0) & std_logic'image(mk1_LED_G0) & std_logic'image(mk1_LED_B0)
+          & std_logic'image(mk1_LED_R1) & std_logic'image(mk1_LED_G1) & std_logic'image(mk1_LED_B1)
+          & std_logic'image(mk1_LED_R2) & std_logic'image(mk1_LED_G2) & std_logic'image(mk1_LED_B2)
+          & std_logic'image(mk1_LED_R3) & std_logic'image(mk1_LED_G3) & std_logic'image(mk1_LED_B3)
           ;
-        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
-          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
-          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
-          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+        if mk1_LED_R0/='1' or mk1_LED_G0/='1' or mk1_LED_B0/='1'
+          or mk1_LED_R1/='0' or mk1_LED_G1/='0' or mk1_LED_B1/='0'                 
+          or mk1_LED_R2/='1' or mk1_LED_G2/='1' or mk1_LED_B2/='1'                 
+          or mk1_LED_R3/='0' or mk1_LED_G3/='0' or mk1_LED_B3/='0' then
           assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
         end if;
         for i in 127 downto 50 loop
@@ -500,15 +530,15 @@ begin
           assert false report "GIT date should have been 9876";
         end if;
         report "LED status is: "
-          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
-          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
-          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
-          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          & std_logic'image(mk1_LED_R0) & std_logic'image(mk1_LED_G0) & std_logic'image(mk1_LED_B0)
+          & std_logic'image(mk1_LED_R1) & std_logic'image(mk1_LED_G1) & std_logic'image(mk1_LED_B1)
+          & std_logic'image(mk1_LED_R2) & std_logic'image(mk1_LED_G2) & std_logic'image(mk1_LED_B2)
+          & std_logic'image(mk1_LED_R3) & std_logic'image(mk1_LED_G3) & std_logic'image(mk1_LED_B3)
           ;
-        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
-          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
-          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
-          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+        if mk1_LED_R0/='1' or mk1_LED_G0/='1' or mk1_LED_B0/='1'
+          or mk1_LED_R1/='0' or mk1_LED_G1/='0' or mk1_LED_B1/='0'                 
+          or mk1_LED_R2/='1' or mk1_LED_G2/='1' or mk1_LED_B2/='1'                 
+          or mk1_LED_R3/='0' or mk1_LED_G3/='0' or mk1_LED_B3/='0' then
           assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
         end if;
         for i in 2 to 79 loop
@@ -539,7 +569,9 @@ begin
         -- Pretend to be Xilinx FPGA driving the process
         -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
         -- per clock phase
-        for s in 1 to 2 loop
+        -- I2C is slower, and so LED updates are slower, so we have to do more
+        -- cycles before the LEDs will get updated.
+        for s in 1 to 3 loop
           report "cycle";
           for i in 0 to 140 loop
             if i < 128 then
@@ -565,15 +597,15 @@ begin
           assert false report "GIT date should have been 0";
         end if;
         report "LED status is: "
-          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
-          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
-          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
-          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          & std_logic'image(mk2_LED_R0) & std_logic'image(mk2_LED_G0) & std_logic'image(mk2_LED_B0)
+          & std_logic'image(mk2_LED_R1) & std_logic'image(mk2_LED_G1) & std_logic'image(mk2_LED_B1)
+          & std_logic'image(mk2_LED_R2) & std_logic'image(mk2_LED_G2) & std_logic'image(mk2_LED_B2)
+          & std_logic'image(mk2_LED_R3) & std_logic'image(mk2_LED_G3) & std_logic'image(mk2_LED_B3)
           ;
-        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
-          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
-          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
-          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+        if mk2_LED_R0/='1' or mk2_LED_G0/='1' or mk2_LED_B0/='1'
+          or mk2_LED_R1/='0' or mk2_LED_G1/='0' or mk2_LED_B1/='0'                 
+          or mk2_LED_R2/='1' or mk2_LED_G2/='1' or mk2_LED_B2/='1'                 
+          or mk2_LED_R3/='0' or mk2_LED_G3/='0' or mk2_LED_B3/='0' then
           assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
         end if;
         for i in 127 downto 50 loop
@@ -641,15 +673,15 @@ begin
           assert false report "GIT date should have been 0";
         end if;
         report "LED status is: "
-          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
-          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
-          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
-          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          & std_logic'image(mk2_LED_R0) & std_logic'image(mk2_LED_G0) & std_logic'image(mk2_LED_B0)
+          & std_logic'image(mk2_LED_R1) & std_logic'image(mk2_LED_G1) & std_logic'image(mk2_LED_B1)
+          & std_logic'image(mk2_LED_R2) & std_logic'image(mk2_LED_G2) & std_logic'image(mk2_LED_B2)
+          & std_logic'image(mk2_LED_R3) & std_logic'image(mk2_LED_G3) & std_logic'image(mk2_LED_B3)
           ;
-        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
-          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
-          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
-          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+        if mk2_LED_R0/='1' or mk2_LED_G0/='1' or mk2_LED_B0/='1'
+          or mk2_LED_R1/='0' or mk2_LED_G1/='0' or mk2_LED_B1/='0'                 
+          or mk2_LED_R2/='1' or mk2_LED_G2/='1' or mk2_LED_B2/='1'                 
+          or mk2_LED_R3/='0' or mk2_LED_G3/='0' or mk2_LED_B3/='0' then
           assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
         end if;
         for i in 2 to 79 loop

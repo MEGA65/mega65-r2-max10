@@ -106,7 +106,22 @@ ENTITY top IS
     -----------------------------------------------------------------
     -- VGA VDAC low-power switch
     -----------------------------------------------------------------
-    vdac_psave_n : out std_logic := '1'
+    vdac_psave_n : out std_logic := '1';
+
+    mk2_LED_R0    : out std_logic := '0';
+    mk2_LED_G0    : out std_logic := '0';
+    mk2_LED_B0    : out std_logic := '0';
+    mk2_LED_R1    : out std_logic := '0';
+    mk2_LED_G1    : out std_logic := '0';
+    mk2_LED_B1    : out std_logic := '0';
+    mk2_LED_R2    : out std_logic := '0';
+    mk2_LED_G2    : out std_logic := '0';
+    mk2_LED_B2    : out std_logic := '0';
+    mk2_LED_R3    : out std_logic := '0';
+    mk2_LED_G3    : out std_logic := '0';
+    mk2_LED_B3    : out std_logic := '0';
+    mk2_LED_SHIFT    : out std_logic := '0';
+    mk2_LED_CAPS    : out std_logic := '0'    
     
     );
 end entity top;	
@@ -129,7 +144,7 @@ architecture simple of top is
   signal mk2_io2_in : std_logic;
   signal mk2_io1_en : std_logic;
   signal mk2_io2_en : std_logic;
-  
+
   signal counter : integer := 0;
   signal counter2 : integer := 0;
   signal led_bright : integer := 0;
@@ -168,7 +183,27 @@ begin
 
     mk2_io2_in => mk2_io2_in,
     mk2_io2 => mk2_io2,
-    mk2_io2_en => mk2_io2_en
+    mk2_io2_en => mk2_io2_en,
+
+      LED_R0           	=> mk2_LED_R0,
+      LED_G0           	=> mk2_LED_G0,
+      LED_B0           	=> mk2_LED_B0,
+   
+      LED_R1           	=> mk2_LED_R1,
+      LED_G1           	=> mk2_LED_G1,
+      LED_B1           	=> mk2_LED_B1,
+    
+      LED_R2           	=> mk2_LED_R2,
+      LED_G2           	=> mk2_LED_G2,
+      LED_B2           	=> mk2_LED_B2,
+    
+      LED_R3           	=> mk2_LED_R3,
+      LED_G3           	=> mk2_LED_G3,
+      LED_B3           	=> mk2_LED_B3,
+    
+      LED_SHIFT           => mk2_LED_SHIFT,
+      LED_CAPS            => mk2_LED_CAPS    
+    
     );
 
   

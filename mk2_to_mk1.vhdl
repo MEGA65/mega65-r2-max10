@@ -18,7 +18,26 @@ entity mk2_to_mk1 is
 
     mk2_io2_in : in std_logic;
     mk2_io2 : out std_logic;
-    mk2_io2_en : out std_logic
+    mk2_io2_en : out std_logic;
+
+    LED_R0           	: OUT std_logic := '0';
+    LED_G0           	: OUT std_logic := '0';
+    LED_B0           	: OUT std_logic := '0';
+   
+    LED_R1           	: OUT std_logic := '0';
+    LED_G1           	: OUT std_logic := '0';
+    LED_B1           	: OUT std_logic := '0';
+    
+    LED_R2           	: OUT std_logic := '0';
+    LED_G2           	: OUT std_logic := '0';
+    LED_B2           	: OUT std_logic := '0';
+    
+    LED_R3           	: OUT std_logic := '0';
+    LED_G3           	: OUT std_logic := '0';
+    LED_B3           	: OUT std_logic := '0';
+    
+    LED_SHIFT           : OUT std_logic := '0';
+    LED_CAPS            : OUT std_logic := '0'    
     
     );
 
@@ -46,7 +65,7 @@ architecture behavioural of mk2_to_mk1 is
   -- data direection register instead of writing to the port
   signal u1_active : std_logic := '0';
   signal u1_reg6 : std_logic := '1';
-  
+
   signal led0_r : std_logic := '0';
   signal led0_g : std_logic := '0';
   signal led0_b : std_logic := '0';
@@ -61,6 +80,7 @@ architecture behavioural of mk2_to_mk1 is
   signal led3_b : std_logic := '0';
   signal led_capslock : std_logic := '0';
   signal led_shiftlock : std_logic := '0';
+  
   signal led_tick : std_logic := '0';
   signal led_counter : integer range 0 to 15 := 0;
   -- shiftlock active low
@@ -96,10 +116,17 @@ begin  -- behavioural
     variable keyram_write_enable : std_logic_vector(7 downto 0);
     variable keyram_offset : integer range 0 to 15 := 0;
     variable keyram_offset_tmp : std_logic_vector(2 downto 0);
-    
+    variable v : unsigned(95 downto 0);
   begin
     if rising_edge(clock100) then
 
+      -- Export LEDs for debugging
+      LED_R0 <= led0_r; LED_G0 <= led0_g; LED_B0 <= led0_b;
+      LED_R1 <= led1_r; LED_G1 <= led1_g; LED_B1 <= led1_b;
+      LED_R2 <= led2_r; LED_G2 <= led2_g; LED_B2 <= led2_b;
+      LED_R3 <= led3_r; LED_G3 <= led3_g; LED_B3 <= led3_b;
+      LED_CAPS <= led_capslock; LED_SHIFT <= led_shiftlock;
+      
       i2c_bit_valid <= '0';
 
       -- De-glitch signal from FPGA
@@ -153,8 +180,13 @@ begin  -- behavioural
           serial_data_in(0) <= mk2_xil_io2;
           if bit_number = 127 then
             -- We have 128 bits of data, so latch the whole thing
-            output_vector(95 downto 1) <= serial_data_in(94 downto 0);
-            output_vector(0) <= mk2_xil_io2;
+            for i in 0 to 94 loop
+              output_vector(i) <= serial_data_in(94-i);
+            end loop;
+            output_vector(95) <= mk2_xil_io2;
+            v(95 downto 1) := unsigned(serial_data_in(94 downto 0));
+            v(0) := mk2_xil_io2;
+            report "Setting output_vector to $" & string'(to_hstring(unsigned'(v)));
           end if;
 
           -- And push matrix data out
@@ -200,27 +232,29 @@ begin  -- behavioural
       end if;
       
       if led_tick='1' then
+        report "LED tick, led_counter = " & integer'image(led_counter) & ", output_vector=$" & to_hexstring(output_vector);
         if led_counter < 15 then
           led_counter <= led_counter + 1;
         else
           led_counter <= 0;
         end if;
+        report "LED reds = " & std_logic'image(led0_r) & std_logic'image(led1_r) & std_logic'image(led2_r) & std_logic'image(led3_r);
         led0_r <= '0'; led0_g <= '0'; led0_b <= '0';
         led1_r <= '0'; led1_g <= '0'; led1_b <= '0';
         led2_r <= '0'; led2_g <= '0'; led2_b <= '0';
         led3_r <= '0'; led3_g <= '0'; led3_b <= '0';
-        if to_integer(unsigned(output_vector(7 downto 4))) > led_counter then led0_r <= '1'; end if;
-        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led0_g <= '1'; end if;
-        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led0_b <= '1'; end if;
-        if to_integer(unsigned(output_vector(31 downto 24))) > led_counter then led1_r <= '1'; end if;
-        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led1_g <= '1'; end if;
-        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led1_b <= '1'; end if;
-        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led2_r <= '1'; end if;
-        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led2_g <= '1'; end if;
-        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led2_b <= '1'; end if;
-        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led3_r <= '1'; end if;
-        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led3_g <= '1'; end if;
-        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led3_b <= '1'; end if;
+        if to_integer(unsigned(output_vector(7 downto 4))) > led_counter then led0_r <= '1'; report "red0"; end if;
+        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led0_g <= '1'; report "green0"; end if;
+        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led0_b <= '1'; report "blue0"; end if;
+        if to_integer(unsigned(output_vector(31 downto 24))) > led_counter then led1_r <= '1'; report "red1"; end if;
+        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led1_g <= '1'; report "green1"; end if;
+        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led1_b <= '1'; report "blue1"; end if;
+        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led2_r <= '1'; report "red2"; end if;
+        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led2_g <= '1'; report "green2"; end if;
+        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led2_b <= '1'; report "blue2"; end if;
+        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led3_r <= '1'; report "red3"; end if;
+        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led3_g <= '1'; report "green3"; end if;
+        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led3_b <= '1'; report "blue3"; end if;
 
         led_shiftlock <= not shiftlock_toggle;
       end if;
@@ -346,7 +380,7 @@ begin  -- behavioural
               when 9 => current_keys(72) <= i2c_bit;-- CAPSLOCK
                         -- XXX need to cancel/toggle CAPSLOCK when held for
                         -- fast-key behaviour
-                        led_capslock <= i2c_bit;
+                        LED_CAPS <= i2c_bit;
               when 10 => current_keys(66) <= i2c_bit;-- ALT
               when 11 => current_keys(71) <= i2c_bit;-- ESC
               when 12 => current_keys(63) <= i2c_bit;-- RUNSTOP
