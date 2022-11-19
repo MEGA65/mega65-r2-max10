@@ -817,7 +817,9 @@ begin
         -- Pretend to be Xilinx FPGA driving the process
         -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
         -- per clock phase
-        for s in 1 to 2 loop
+        -- I2C scanning is slower, so we need more cycles through before the
+        -- key press will be exported.
+        for s in 1 to 4 loop
           report "cycle";
           for i in 0 to 140 loop
             if i < 128 then
@@ -855,7 +857,7 @@ begin
           assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
         end if;
         for i in 2 to 79 loop
-          if i /= 73 then
+          if i /= 60 then
             if to_X01(keyboard_data(129 - i)) /= '1' then
               assert false report "other keys should be released, but matrix position " & integer'image(i)
                 & " was not high.";
