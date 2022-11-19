@@ -109,6 +109,8 @@ BEGIN
       if cnt = x"00000000" then
         mega65_ordered_matrix <= (others => '1');
       end if;
+
+--      report "kio8 = " & std_logic'image(kio8) & ", kio9 = " & std_logic'image(kio9);
       
       kio8_history(0) <= kio8;
       kio8_history(3 downto 1) <= kio8_history(2 downto 0);
@@ -148,7 +150,7 @@ BEGIN
       if KIO8='0' then
         clock_duration <= 0;
         if clock_duration /= 0 then
-          report "Saw half clock of duration " & integer'image(clock_duration);
+--          report "Saw half clock of duration " & integer'image(clock_duration);
         end if;
       else
         if clock_duration < 31 then
@@ -171,10 +173,10 @@ BEGIN
         end loop;
         bit_number <= 0;
         KIO10 <= '1';
-        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
+--        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
       else
         if last_last_KIO8 = '0' and last_KIO8 = '1' then
-          report "CLK from Xilinx rose";
+--          report "CLK from Xilinx rose";
          -- Latch data on rising edge
           if bit_number /= 255 then
             bit_number <= bit_number + 1;
@@ -306,7 +308,7 @@ BEGIN
       end if;
       
       -- Scan keyboard
-      report "scan_phase = " & integer'image(scan_phase) & ", SCAN_OUT=" & to_string(scan_out_internal) & ", SCAN_IN=" & to_string(SCAN_IN);
+--      report "scan_phase = " & integer'image(scan_phase) & ", SCAN_OUT=" & to_string(scan_out_internal) & ", SCAN_IN=" & to_string(SCAN_IN);
         
       if cnt(7 downto 0) = "00000000" then
         -- Rotate through scan sequence

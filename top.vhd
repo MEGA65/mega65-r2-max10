@@ -301,6 +301,7 @@ begin
       k_io2 <= kb_io2;
       kb_io3 <= k_io3;
     elsif cpld_cfg0='0' and mk1_connected='0' then
+--      report "mk-ii keyboard connected";
       -- MK-II keyboard connected
       -- k_io2 = I2C SCL
       -- k_io1 = I2C SDA
@@ -345,14 +346,21 @@ begin
       -- assume MK-II keyboard, and correct our decision in 1 clock tick if it was
       -- wrong.  Doing it the other way around would cause fake key presses during
       -- the 5000 cycles while we wait to decide it really is a MK-II keyboard.
-      if k_io3 = '1' then
+--      report "k_io3 = " & std_logic'image(k_io3);
+      if to_X01(k_io3) = '1' then
         mkii_counter <= 0;
         mk1_connected <= '1';
+        if mk1_connected='0' then
+          report "Switching to MK-I keyboard protocol";
+        end if;
       else
         if mkii_counter < 5000 then
           mkii_counter <= mkii_counter + 1;
         else
           mk1_connected <= '0';
+          if mk1_connected='1' then
+            report "Switching to MK-II keyboard protocol";
+          end if;
         end if;
       end if;
     end if;

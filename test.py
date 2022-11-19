@@ -12,7 +12,6 @@ lib = vu.add_library("lib")
 lib.add_source_files("tests/*.vhdl")
 lib.add_source_files("*.vhdl")
 lib.add_source_files("*.vhd")
-lib.add_source_files("mega65kbd_to_matrix.vhdl")
 lib.add_source_files("i2c_slave/rtl/vhdl/*.vhdl")
 
 vu.set_compile_option("ghdl.a_flags", ["-frelaxed-rules"])

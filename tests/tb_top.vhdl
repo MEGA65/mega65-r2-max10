@@ -172,11 +172,16 @@ begin
   process (mk1_connected,k_io1,k_io2,mk1_KIO10) is
   begin
     if mk1_connected = '1' then
+      report "MK-I connected";
       -- MK-I keyboard connected
       mk1_KIO8 <= k_io1;
       mk1_KIO9 <= k_io2;
       k_io3 <= mk1_KIO10;
+      if mk1_KIO10 /= '1' then
+        report "KIO10 = 0";
+      end if;
     else
+      report "MK-II connected";
       -- MK-II keyboard connected
       -- This is tricker, as we have to make two-way connection
       -- for SDA (KIO8) at least.
@@ -343,7 +348,13 @@ begin
       vdac_psave_n => vdac_psave_n
     
       );
-   
+
+  process is
+  begin
+    cpld_clk <= '0'; wait for 5 ns;
+    cpld_clk <= '1'; wait for 5 ns;
+  end process;  
+  
   main : process
     function Reverse (x : std_logic_vector) return std_logic_vector is
       alias alx : std_logic_vector (x'length - 1 downto 0) is x;
