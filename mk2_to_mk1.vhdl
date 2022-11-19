@@ -10,7 +10,7 @@ entity mk2_to_mk1 is
 
     mk2_xil_io1 : in std_logic;
     mk2_xil_io2 : in std_logic;
-    mk2_xil_io3 : out std_logic;
+    mk2_xil_io3 : out std_logic := '1';
     
     mk2_io1_in : in std_logic;
     mk2_io1 : out std_logic;
@@ -29,7 +29,7 @@ architecture behavioural of mk2_to_mk1 is
   signal output_vector : std_logic_vector(127 downto 0);
   signal disco_vector : std_logic_vector(95 downto 0);
 
-  signal i2c_counter : integer range 0 to 50 := 0;
+  signal i2c_counter : integer range 0 to 125 := 0;
   signal i2c_tick : std_logic := '0';
   signal i2c_state : integer := 0;
   signal addr : unsigned(2 downto 0) := to_unsigned(0,3);

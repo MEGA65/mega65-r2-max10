@@ -154,6 +154,24 @@ architecture simple of top is
   
 begin
 
+  mk2: entity work.mk2_to_mk1 
+  port map (
+    clock100 => cpld_clk,
+
+    mk2_xil_io1 => mk2_xil_io1,
+    mk2_xil_io2 => mk2_xil_io2,
+    mk2_xil_io3 => mk2_xil_io3,
+    
+    mk2_io1_in => mk2_io1_in,
+    mk2_io1 => mk2_io1,
+    mk2_io1_en => mk2_io1_en,
+
+    mk2_io2_in => mk2_io2_in,
+    mk2_io2 => mk2_io2,
+    mk2_io2_en => mk2_io2_en
+    );
+
+  
   -- XXX Use something like this for MK-II keyboard support
 --  process (kio1_en, kio1_out) is
 --  begin
@@ -325,7 +343,8 @@ begin
       -- Connect Xilinx MK-I interface to MK-II controller
       mk2_xil_io1 <= kb_io1;
       mk2_xil_io2 <= kb_io2;
-      kb_io3 <= mk2_xil_io1;
+      kb_io3 <= mk2_xil_io3;
+      report "exporting MK-II bit " & std_logic'image(mk2_xil_io3);
     else
       -- Otherwise connect keyboard to JTAG
       te_tdo <= k_tdo;
