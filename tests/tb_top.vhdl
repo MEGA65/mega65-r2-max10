@@ -101,6 +101,8 @@ architecture tb of tb_top is
   signal k_jtagen : std_logic;
   signal k_io1 : std_logic;
   signal k_io2 : std_logic;
+  signal k_io1_en : std_logic;
+  signal k_io2_en : std_logic;
   signal k_io3 : std_logic;
 
     -----------------------------------------------------------------
@@ -176,14 +178,155 @@ architecture tb of tb_top is
   -- High if we are simulating a MK-I keyboard being connected,
   -- or low if simulating a MK-II keyboard being connected.
   signal mk1_connected : std_logic := '1';
+
+  signal u1port0 : unsigned(7 downto 0) := (others => '1');
+  signal u1port1 : unsigned(7 downto 0) := (others => '1');
+  signal u1_reg : integer;
+  signal u1_read : std_logic;
+  signal u1_write : std_logic;
+  signal u1_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u1_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal u2port0 : unsigned(7 downto 0) := (others => '1');
+  signal u2port1 : unsigned(7 downto 0) := (others => '1');
+  signal u2_reg : integer;
+  signal u2_read : std_logic;
+  signal u2_write : std_logic;
+  signal u2_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u2_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal u3port0 : unsigned(7 downto 0) := (others => '1');
+  signal u3port1 : unsigned(7 downto 0) := (others => '1');
+  signal u3_reg : integer;
+  signal u3_read : std_logic;
+  signal u3_write : std_logic;
+  signal u3_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u3_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal u4port0 : unsigned(7 downto 0) := (others => '1');
+  signal u4port1 : unsigned(7 downto 0) := (others => '1');
+  signal u4_reg : integer;
+  signal u4_read : std_logic;
+  signal u4_write : std_logic;
+  signal u4_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u4_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal u5port0 : unsigned(7 downto 0) := (others => '1');
+  signal u5port1 : unsigned(7 downto 0) := (others => '1');
+  signal u5_reg : integer;
+  signal u5_read : std_logic;
+  signal u5_write : std_logic;
+  signal u5_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u5_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal u6port0 : unsigned(7 downto 0) := (others => '1');
+  signal u6port1 : unsigned(7 downto 0) := (others => '1');
+  signal u6_reg : integer;
+  signal u6_read : std_logic;
+  signal u6_write : std_logic;
+  signal u6_saw_read : unsigned(7 downto 0) := (others => '0');
+  signal u6_saw_write : unsigned(7 downto 0) := (others => '0');
+
+  signal reset : std_logic := '1';
   
 begin
 
+  u1: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100000"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u1port0,
+              port1 => u1port1,
+              accessed_reg => u1_reg,
+              reg_write_strobe => u1_write,
+              reg_read_strobe => u1_read
+              );
+
+  u2: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100011"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u2port0,
+              port1 => u2port1,
+              accessed_reg => u2_reg,
+              reg_write_strobe => u2_write,
+              reg_read_strobe => u2_read
+              );
+
+  u3: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100001"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u3port0,
+              port1 => u3port1,
+              accessed_reg => u3_reg,
+              reg_write_strobe => u3_write,
+              reg_read_strobe => u3_read
+              );
+
+  u4: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100100"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u4port0,
+              port1 => u4port1,
+              accessed_reg => u4_reg,
+              reg_write_strobe => u4_write,
+              reg_read_strobe => u4_read
+              );
+
+  u5: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100010"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u5port0,
+              port1 => u5port1,
+              accessed_reg => u5_reg,
+              reg_write_strobe => u5_write,
+              reg_read_strobe => u5_read
+              );
+
+  u6: entity work.pca9555
+    generic map ( clock_frequency => 1e8,
+                  address => "0100101"
+                  )
+    port map (clock => cpld_clk,
+              reset => reset,
+              scl => mk2_kio9,
+              sda => mk2_kio8,
+              port0 => u6port0,
+              port1 => u6port1,
+              accessed_reg => u6_reg,
+              reg_write_strobe => u6_write,
+              reg_read_strobe => u6_read
+              );
+
+  
   -- Simulation can select which keyboard type is connected
-  process (mk1_connected,k_io1,k_io2,mk1_KIO10) is
+  process (mk1_connected,k_io1,k_io2,mk2_KIO8, mk2_KIO9, mk2_KIO10, mk1_KIO10,k_io1_en, k_io2_en) is
   begin
     if mk1_connected = '1' then
---      report "MK-I connected";
+      report "MK-I connected: " & std_logic'image(k_io1)  & std_logic'image(k_io2);
       -- MK-I keyboard connected
       mk1_KIO8 <= k_io1;
       mk1_KIO9 <= k_io2;
@@ -191,14 +334,24 @@ begin
       if mk1_KIO10 /= '1' then
         report "KIO10 = 0";
       end if;
+      k_io1 <= 'Z';
+      k_io2 <= 'Z';
     else
---      report "MK-II connected";
+      report "MK-II connected";
       -- MK-II keyboard connected
       -- This is tricker, as we have to make two-way connection
       -- for SDA (KIO8) at least.
       -- XXX Not implemented
-      mk2_KIO8 <= k_io1;
-      mk2_KIO9 <= k_io2;
+      if k_io1_en='1' then
+        mk2_KIO8 <= k_io1;
+      else
+        k_io1 <= mk2_KIO8;
+      end if;
+      if k_io2_en='1' then
+        mk2_KIO9 <= k_io2;
+      else
+        k_io2 <= mk2_KIO9;
+      end if;
       k_io3 <= mk2_KIO10;
     end if;
   end process;
@@ -348,6 +501,8 @@ begin
       k_io1 => k_io1,
       k_io2 => k_io2,
       k_io3 => k_io3,
+      k_io1_en => k_io1_en,
+      k_io2_en => k_io2_en,
 
     -----------------------------------------------------------------
     -- Reset button
@@ -383,8 +538,15 @@ begin
 
   process is
   begin
-    cpld_clk <= '0'; wait for 5 ns;
-    cpld_clk <= '1'; wait for 5 ns;
+    while true loop
+      cpld_clk <= '0'; wait for 5 ns;
+      cpld_clk <= '1'; wait for 5 ns;
+      cpld_clk <= '0'; wait for 5 ns;
+      cpld_clk <= '1'; wait for 5 ns;
+      cpld_clk <= '0'; wait for 5 ns;
+      cpld_clk <= '1'; wait for 5 ns;
+      reset <= '0';
+    end loop;
   end process;  
   
   main : process
@@ -641,8 +803,8 @@ begin
 
         mk1_connected <= '0';
         
-        -- UP key held down
-        key_CURSORUP <= '0';
+        -- SPACE key held down
+        u4port1(7) <= '0';
         
         -- Pretend to be Xilinx FPGA driving the process
         -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
