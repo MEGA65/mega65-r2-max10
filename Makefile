@@ -1,2 +1,2 @@
 all:	
-	./build.sh
+	time -p ./build.sh

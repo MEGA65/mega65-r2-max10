@@ -168,12 +168,14 @@ architecture simple of top is
 
   signal kio1_en : std_logic := '0';
   signal kio1_out : std_logic := '0';
+
+  signal clock50 : std_logic := '0';
   
 begin
 
   mk2: entity work.mk2_to_mk1 
   port map (
-    clock100 => cpld_clk,
+    clock50 => clock50,
 
     mk2_xil_io1 => mk2_xil_io1,
     mk2_xil_io2 => mk2_xil_io2,
@@ -220,6 +222,13 @@ begin
   fpga_tdi <= te_tdi;
   fpga_tms <= te_tms;
 
+  process (cpld_clk) is
+  begin
+    if rising_edge(cpld_clk) then
+      clock50 <= not clock50;
+    end if;
+  end process;
+  
   process (xilinx_sync,clkout,old_protocol) is
     variable xilinx_rx_old : std_logic := '1';
     variable xilinx_rx_new : std_logic := '1';
@@ -227,13 +236,13 @@ begin
 
     -- We are now using the fixed crystal CPLD_CLK at 100MHz
 
-    led_g <= cpld_clk;
+    led_g <= clock50;
 
-    clkout <= cpld_clk;
+    clkout <= clock50;
     
-    if rising_edge(clkout) then
+    if rising_edge(clock50) then
       if xilinx_half = last_xilinx_half then
-        if sync_counter < 16383 then
+        if sync_counter < 8191 then
           sync_counter <= sync_counter + 1;
         end if;
         if sync_counter = 16 then
@@ -246,7 +255,7 @@ begin
 
       -- Disable use of old protcol, since it is
       -- now _very_ deprecated
-      if sync_counter = 16363 then
+      if sync_counter = 8191 then
         old_protocol <= '1';
       else
         old_protocol <= '0';
@@ -327,9 +336,9 @@ begin
   end process;
   
   -- MK-II keyboard detection and operation
-  process (cpld_clk) is
+  process (clock50) is
   begin
-    if rising_edge(cpld_clk) then
+    if rising_edge(clock50) then
 
   -- Connect keyboard based on keyboard mode
     if cpld_cfg0='0' and mk1_connected='1' then

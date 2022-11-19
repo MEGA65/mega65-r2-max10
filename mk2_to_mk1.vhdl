@@ -6,7 +6,7 @@ use work.debugtools.all;
 
 entity mk2_to_mk1 is
   port (
-    clock100 : in std_logic;
+    clock50 : in std_logic;
 
     mk2_xil_io1 : in std_logic;
     mk2_xil_io2 : in std_logic;
@@ -47,7 +47,7 @@ architecture behavioural of mk2_to_mk1 is
 
   signal output_vector : std_logic_vector(127 downto 0);
 
-  signal i2c_counter : integer range 0 to 125 := 0;
+  signal i2c_counter : integer range 0 to 63 := 0;
   signal i2c_tick : std_logic := '0';
   signal i2c_state : integer := 0;
   -- Start with addr 5, so that we wrap to writing correct DDR values into addr
@@ -112,13 +112,13 @@ architecture behavioural of mk2_to_mk1 is
   
 begin  -- behavioural
 
-  process (clock100)
+  process (clock50)
     variable keyram_write_enable : std_logic_vector(7 downto 0);
     variable keyram_offset : integer range 0 to 15 := 0;
     variable keyram_offset_tmp : std_logic_vector(2 downto 0);
     variable v : unsigned(95 downto 0);
   begin
-    if rising_edge(clock100) then
+    if rising_edge(clock50) then
 
       -- Export LEDs for debugging
       LED_R0 <= led0_r; LED_G0 <= led0_g; LED_B0 <= led0_b;
@@ -204,8 +204,8 @@ begin  -- behavioural
       
       
       -- Generate ~400KHz I2C clock
-      -- We use 2 or 3 ticks per clock, so 100MHz/(400KHz*2) = 125
-      if i2c_counter < 125 then
+      -- We use 2 or 3 ticks per clock, so 50MHz/(400KHz*2) = 63
+      if i2c_counter < 63 then
         i2c_counter <= i2c_counter + 1;
         i2c_tick <= '0';
       else
