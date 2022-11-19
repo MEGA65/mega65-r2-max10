@@ -45,7 +45,7 @@ end entity mk2_to_mk1;
 
 architecture behavioural of mk2_to_mk1 is
 
-  signal output_vector : std_logic_vector(127 downto 0);
+signal output_vector : std_logic_vector(127 downto 0);
 
   signal i2c_counter : integer range 0 to 63 := 0;
   signal i2c_tick : std_logic := '0';
@@ -270,6 +270,7 @@ begin  -- behavioural
         case addr is
           when "011" => -- U2
             case i2c_bit_num is
+              -- Confirmed port 0 maps to all correct keys
               when 0 => current_keys(67) <= i2c_bit; -- HELP
               when 1 => current_keys(70) <= i2c_bit;-- F13
               when 2 => current_keys(69) <= i2c_bit;-- F11
@@ -281,6 +282,7 @@ begin  -- behavioural
               when 5 => current_keys(51) <= i2c_bit;-- HOME
               when 6 => current_keys(48) <= i2c_bit;-- GBP
               when 7 => current_keys(43) <= i2c_bit;-- MINUS
+              -- NONE of the following work right now
               when 8 => current_keys(41) <= i2c_bit;-- P
               when 9 => current_keys(38) <= i2c_bit;-- O
               when 10 => current_keys(33) <= i2c_bit;-- I
@@ -294,17 +296,19 @@ begin  -- behavioural
 
           when "001" => -- U3
             case i2c_bit_num is
-              when 0 => shiftlock <= i2c_bit;-- SHIFTLOCK
+              -- Order was reversed for these, so swapped here
+              when 7 => shiftlock <= i2c_bit;-- SHIFTLOCK
                         if i2c_bit='0' and shiftlock='1' then
                           shiftlock_toggle <= not shiftlock_toggle;
                         end if;
-              when 1 => current_keys(10) <= i2c_bit;-- A
-              when 2 => current_keys(13) <= i2c_bit;-- S
-              when 3 => current_keys(18) <= i2c_bit;-- D
-              when 4 => current_keys(65) <= i2c_bit;-- TAB
-              when 5 => current_keys(62) <= i2c_bit;-- Q
-              when 6 => current_keys(9) <= i2c_bit;-- W
-              when 7 => current_keys(14) <= i2c_bit;-- E
+              when 6 => current_keys(10) <= i2c_bit;-- A
+              when 5 => current_keys(13) <= i2c_bit;-- S
+              when 4 => current_keys(18) <= i2c_bit;-- D
+              when 3 => current_keys(65) <= i2c_bit;-- TAB
+              when 2 => current_keys(62) <= i2c_bit;-- Q
+              when 1 => current_keys(9) <= i2c_bit;-- W
+              when 0 => current_keys(14) <= i2c_bit;-- E
+              -- NONE of these seem to work
               when 8 => kbd_gpio1 <= i2c_bit;-- GPIO1
               when 9 => kbd_gpio2 <= i2c_bit;-- GPIO2
               when 10 => current_keys(58) <= i2c_bit;-- CTRL
@@ -319,42 +323,46 @@ begin  -- behavioural
           when "100" => -- U4
             report "i2c bit #" & integer'image(i2c_bit_num) & " = " & std_logic'image(i2c_bit);
             case i2c_bit_num is
-              when 0 => current_keys(47) <= i2c_bit;-- <
-              when 1 => current_keys(44) <= i2c_bit;-- >
-              when 2 => current_keys(31) <= i2c_bit;-- V
-              when 3 => current_keys(28) <= i2c_bit;-- B
-              when 4 => current_keys(39) <= i2c_bit;-- N
-              when 5 => current_keys(37) <= i2c_bit;-- K
-              when 6 => current_keys(36) <= i2c_bit;-- M
-              when 7 => current_keys(42) <= i2c_bit;-- L
-              when 8 => current_keys(34) <= i2c_bit;-- J
-              when 9 => current_keys(25) <= i2c_bit;-- Y
-              when 10 => current_keys(29) <= i2c_bit;-- H
-              when 11 => current_keys(22) <= i2c_bit;-- T
-              when 12 => current_keys(26) <= i2c_bit;-- G
-              when 13 => current_keys(17) <= i2c_bit;-- R
-              when 14 => current_keys(21) <= i2c_bit;-- F
-              when 15 => current_keys(60) <= i2c_bit;-- SPACE
+              -- Order was reversed
+              when 7 => current_keys(47) <= i2c_bit;-- <
+              when 6 => current_keys(44) <= i2c_bit;-- >
+              when 5 => current_keys(31) <= i2c_bit;-- V
+              when 4 => current_keys(28) <= i2c_bit;-- B
+              when 3 => current_keys(39) <= i2c_bit;-- N
+              when 2 => current_keys(37) <= i2c_bit;-- K
+              when 1 => current_keys(36) <= i2c_bit;-- M
+              when 0 => current_keys(42) <= i2c_bit;-- L
+              -- Order was reversed
+              when 15 => current_keys(34) <= i2c_bit;-- J
+              when 14 => current_keys(25) <= i2c_bit;-- Y
+              when 13 => current_keys(29) <= i2c_bit;-- H
+              when 12 => current_keys(22) <= i2c_bit;-- T
+              when 11 => current_keys(26) <= i2c_bit;-- G
+              when 10 => current_keys(17) <= i2c_bit;-- R
+              when  9 => current_keys(21) <= i2c_bit;-- F
+              when  8 => current_keys(60) <= i2c_bit;-- SPACE
                          report "SPACE is " & std_logic'image(i2c_bit);
               when others => null;
             end case;
 
           when "010" => -- U5
             case i2c_bit_num is
-              when 0 => current_keys(52) <= i2c_bit;-- RSHIFT
-              when 1 => current_keys(55) <= i2c_bit;-- ?
-              when 2 => -- duplicate of >
-              when 3 => -- duplucate of <
-              when 4 => current_keys(74) <= i2c_bit;-- LEFT
+              -- Order was reversed
+              when 7 => current_keys(52) <= i2c_bit;-- RSHIFT
+              when 6 => current_keys(55) <= i2c_bit;-- ?
+              when 5 => -- duplicate of >
+              when 4 => -- duplucate of <
+              when 3 => current_keys(74) <= i2c_bit;-- LEFT
                         -- XXX need to be delayed until we have
                         -- exported RSHIFT
                         leftkey <= not i2c_bit;
-              when 5 => current_keys(73) <= i2c_bit;-- UP
+              when 2 => current_keys(73) <= i2c_bit;-- UP
                         -- XXX need to be delayed until we have
                         -- exported RSHIFT
                         upkey <= not i2c_bit;
-              when 6 => current_keys(7) <= i2c_bit;-- DOWN
-              when 7 => current_keys(2) <= i2c_bit;-- RIGHT
+              when 1 => current_keys(7) <= i2c_bit;-- DOWN
+              when 0 => current_keys(2) <= i2c_bit;-- RIGHT
+              -- SUSPECT these are reversed, but generally not working
               when 8 => current_keys(45) <= i2c_bit;-- :
               when 9 => current_keys(50) <= i2c_bit;-- ;
               when 10 => current_keys(53) <= i2c_bit;-- =
@@ -372,14 +380,16 @@ begin  -- behavioural
 
           when "101" => -- U6
             case i2c_bit_num is
-              when 0 => current_keys(11) <= i2c_bit;-- 4
-              when 1 => current_keys(16) <= i2c_bit;-- 5
-              when 2 => current_keys(19) <= i2c_bit;-- 6
-              when 3 => current_keys(24) <= i2c_bit;-- 7
-              when 4 => current_keys(27) <= i2c_bit;-- 8
-              when 5 => current_keys(32) <= i2c_bit;-- 9
-              when 6 => current_keys(5) <= i2c_bit;-- F3
-              when 7 => current_keys(4) <= i2c_bit;-- F1
+              -- Were reversed
+              when 7 => current_keys(11) <= i2c_bit;-- 4
+              when 6 => current_keys(16) <= i2c_bit;-- 5
+              when 5 => current_keys(19) <= i2c_bit;-- 6
+              when 4 => current_keys(24) <= i2c_bit;-- 7
+              when 3 => current_keys(27) <= i2c_bit;-- 8
+              when 2 => current_keys(32) <= i2c_bit;-- 9
+              when 1 => current_keys(5) <= i2c_bit;-- F3
+              when 0 => current_keys(4) <= i2c_bit;-- F1
+              -- Seemingly not working
               when 8 => current_keys(64) <= i2c_bit;-- NOSCROLL
               when 9 => current_keys(72) <= i2c_bit;-- CAPSLOCK
                         -- XXX need to cancel/toggle CAPSLOCK when held for
