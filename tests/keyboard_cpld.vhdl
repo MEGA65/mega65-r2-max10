@@ -17,7 +17,7 @@ ENTITY keyboard_cpld IS
 
     KIO8 : in std_logic := '0';
     KIO9 : in std_logic := '0';
-    KIO10 : out std_logic := '0';
+    KIO10 : out std_logic := '1';
     
     SCAN_OUT			: OUT std_logic_vector(9 downto 0) := (others => '1');
     SCAN_IN		    	: IN std_logic_vector(7 downto 0);

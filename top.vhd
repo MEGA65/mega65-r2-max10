@@ -115,6 +115,20 @@ architecture simple of top is
 
   signal clkout : std_logic := '0';
   signal led : std_logic := '0';
+
+  -- Assume MK-II keyboard on power on, for the reasons explained further down
+  -- in the file
+  signal mk1_connected : std_logic := '0';
+  signal mkii_counter : integer range 0 to 5000 := 5000;
+  signal mk2_xil_io1 : std_logic;
+  signal mk2_xil_io2 : std_logic;
+  signal mk2_xil_io3 : std_logic;
+  signal mk2_io1 : std_logic;
+  signal mk2_io2 : std_logic;
+  signal mk2_io1_in : std_logic;
+  signal mk2_io2_in : std_logic;
+  signal mk2_io1_en : std_logic;
+  signal mk2_io2_en : std_logic;
   
   signal counter : integer := 0;
   signal counter2 : integer := 0;
@@ -166,30 +180,8 @@ begin
     variable xilinx_rx_new : std_logic := '1';
   begin
 
-    -- Somewhere between 55MHz and 116MHz
-    -- The MEGA65 core will drive this line at
-    -- 40.5MHz, which means that we should see between
-    -- ~1.3x and ~3x the number of pulses
-    -- The counter on the MEGA65 counts to 79,
-    -- so the worst-case we should see is ~79x3 = ~240
-    -- We were using 127 as the limit previously, which
-    -- is clearly too low.
-    -- But even now with it set much, much higher than it
-    -- needs to be, subtle changes to the design (like changing
-    -- what we put on the LED!) are affecting whether the sync
-    -- pulse is correctly handled.
-    -- So let's think about what that sync pulse should look like.
-    -- ~3x is pretty close to 4x, so we should probably tighten the
-    -- tolerance for that.
-    -- 16 cycles of 40.5MHz = 16 x ~25ns = ~400ns
-    -- At 55MHz, that will be 22 cycles.
-    -- At 116MHz, that will be 11 cycles.
-    -- So we must not use a sync delay >11.
-    -- 1 cycle at 40.5MHz should be 1.1 to 2.2 cycles, but as the
-    -- edges are not guaranteed to be aligned, odd effects may be
-    -- possible. Experience shows that 4 is too low.
+    -- We are now using the fixed crystal CPLD_CLK at 100MHz
 
---    led_g <= sync_toggle;
     led_g <= cpld_clk;
 
     clkout <= cpld_clk;
@@ -289,10 +281,11 @@ begin
     end if;
   end process;
   
-  
+
+  -- Connect keyboard based on keyboard mode
   process (cpld_cfg0,fpga_tdo,k_tdo,kb_io1,kb_io2,k_io3,te_tdi,te_tms,te_tck) is
   begin
-    if cpld_cfg0='0' then
+    if cpld_cfg0='0' and mk1_connected='1' then
       te_tdo <= fpga_tdo;
       -- And connect keyboard to Xilinx FPGA, and turn off JTAG mode for it
       k_jtagen <= '0';
@@ -306,7 +299,32 @@ begin
 --      report "Bridging Xilinx MK-I keyboard signals to keyboard";
       k_io1 <= kb_io1;
       k_io2 <= kb_io2;
-      kb_io3 <= k_io3;      
+      kb_io3 <= k_io3;
+    elsif cpld_cfg0='0' and mk1_connected='0' then
+      -- MK-II keyboard connected
+      -- k_io2 = I2C SCL
+      -- k_io1 = I2C SDA
+      -- k_io3 = held low
+      -- kb_io? should get the synthesised MK-I-style keyboard information
+
+      -- Make tri-state link from keyboard connector to MK-II controller
+      mk2_io1_in <= mk2_io1;
+      if mk2_io1_en='1' then
+        k_io1 <= mk2_io1;
+      else
+        k_io1 <= 'Z';
+      end if;
+      mk2_io2_in <= mk2_io2;
+      if mk2_io2_en='1' then
+        k_io2 <= mk2_io2;
+      else
+        k_io2 <= 'Z';
+      end if;
+
+      -- Connect Xilinx MK-I interface to MK-II controller
+      mk2_xil_io1 <= kb_io1;
+      mk2_xil_io2 <= kb_io2;
+      kb_io3 <= mk2_xil_io1;
     else
       -- Otherwise connect keyboard to JTAG
       te_tdo <= k_tdo;
@@ -316,16 +334,38 @@ begin
       k_tck <= te_tck;
 
     end if;
-  end process;  
+  end process;
+
+  -- MK-II keyboard detection and operation
+  process (cpld_clk) is
+  begin
+    if rising_edge(cpld_clk) then
+      -- Detect MK-I keyboard by looking for KIO10 going high, as MK-II keyboard
+      -- holds this line forever low.  As MK-I will start with KIO10 high, we can
+      -- assume MK-II keyboard, and correct our decision in 1 clock tick if it was
+      -- wrong.  Doing it the other way around would cause fake key presses during
+      -- the 5000 cycles while we wait to decide it really is a MK-II keyboard.
+      if k_io3 = '1' then
+        mkii_counter <= 0;
+        mk1_connected <= '1';
+      else
+        if mkii_counter < 5000 then
+          mkii_counter <= mkii_counter + 1;
+        else
+          mk1_connected <= '0';
+        end if;
+      end if;
+    end if;
+  end process;
 
   
   process(clkout) is
   begin
     if rising_edge(clkout) then
 
-      -- Communications with the Xilinx FPGA is a bit "fun", because the internal
-      -- oscillator of the MAX10 can drift anywhere between 55MHz and 116MHz based
-      -- on temperature, voltage, phase of moon etc.
+      -- We are now using fixed 100MHz clock, which simplifies things a lot from
+      -- using the 55-116MHz internal oscillator.
+
       -- Also, we have only two wires between the two FPGAs for general communications.
       -- FPGA_TX and FPGA_RX.  This means we don't have enough lines for TX and
       -- RX and an explicit clock.
