@@ -306,6 +306,8 @@ BEGIN
       end if;
       
       -- Scan keyboard
+      report "scan_phase = " & integer'image(scan_phase) & ", SCAN_OUT=" & to_string(scan_out_internal) & ", SCAN_IN=" & to_string(SCAN_IN);
+        
       if cnt(7 downto 0) = "00000000" then
         -- Rotate through scan sequence
         if scan_phase < 9 then
