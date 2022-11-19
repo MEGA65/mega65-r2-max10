@@ -297,7 +297,8 @@ begin
 						write_ack <= false;
 						read_mode_received <= false;
 					when wait_for_address =>
-						if read_state = read_end then
+                                          if read_state = read_end then
+                                            report "saw address " & to_string(input_shift(7 downto 1));
 							read_byte <= false;
 							read_mode_received <= input_shift(0) = '1';
 							if input_shift(7 downto 1) = address then

@@ -124,7 +124,8 @@ begin
 			state <= idle;
 		else
                   if rising_edge(clock) then
-
+--                    report "sda = " & std_logic'image(sda) & ", scl = " & std_logic'image(scl);
+                    
                           reg_write_strobe <= '0';
                           reg_read_strobe <= '0';
 				-- I2C send/receive

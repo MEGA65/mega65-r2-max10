@@ -323,36 +323,44 @@ begin
 
   
   -- Simulation can select which keyboard type is connected
-  process (mk1_connected,k_io1,k_io2,mk2_KIO8, mk2_KIO9, mk2_KIO10, mk1_KIO10,k_io1_en, k_io2_en) is
+  process (cpld_clk,mk1_connected,k_io1,k_io2,mk2_KIO8, mk2_KIO9, mk2_KIO10, mk1_KIO10,k_io1_en, k_io2_en) is
   begin
+    if rising_edge(cpld_clk) then
     if mk1_connected = '1' then
-      report "MK-I connected: " & std_logic'image(k_io1)  & std_logic'image(k_io2);
+--      report "MK-I connected: " & std_logic'image(k_io1)  & std_logic'image(k_io2);
       -- MK-I keyboard connected
       mk1_KIO8 <= k_io1;
       mk1_KIO9 <= k_io2;
       k_io3 <= mk1_KIO10;
       if mk1_KIO10 /= '1' then
-        report "KIO10 = 0";
+--        report "KIO10 = 0";
       end if;
       k_io1 <= 'Z';
       k_io2 <= 'Z';
     else
-      report "MK-II connected";
+      -- report "MK-II connected";
       -- MK-II keyboard connected
       -- This is tricker, as we have to make two-way connection
       -- for SDA (KIO8) at least.
       -- XXX Not implemented
       if k_io1_en='1' then
         mk2_KIO8 <= k_io1;
+--        report "Driving KIO8 to " & std_logic'image(k_io1);
       else
         k_io1 <= mk2_KIO8;
+--        report "Tri-stating KIO8";
+        mk2_kio8 <= 'H';
       end if;
       if k_io2_en='1' then
         mk2_KIO9 <= k_io2;
+--        report "Driving KIO9 to " & std_logic'image(k_io2);
       else
         k_io2 <= mk2_KIO9;
+--        report "Tri-stating KIO9";
+        mk2_kio9 <= 'H';
       end if;
       k_io3 <= mk2_KIO10;
+    end if;
     end if;
   end process;
     

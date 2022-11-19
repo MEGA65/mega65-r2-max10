@@ -455,7 +455,7 @@ begin  -- behavioural
 
           -- Write to set address to read from
           -- Send $02 to indicate read will be of register 2
-          when 528 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 528 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 529 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 530 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';                          
           when 531 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';

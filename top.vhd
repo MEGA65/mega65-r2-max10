@@ -326,10 +326,12 @@ begin
     end if;
   end process;
   
+  -- MK-II keyboard detection and operation
+  process (cpld_clk) is
+  begin
+    if rising_edge(cpld_clk) then
 
   -- Connect keyboard based on keyboard mode
-  process (cpld_cfg0,fpga_tdo,k_tdo,kb_io1,kb_io2,k_io3,te_tdi,te_tms,te_tck) is
-  begin
     if cpld_cfg0='0' and mk1_connected='1' then
       te_tdo <= fpga_tdo;
       -- And connect keyboard to Xilinx FPGA, and turn off JTAG mode for it
@@ -341,13 +343,15 @@ begin
       -- Connect keyboard GPIO interface
       -- XXX Disable direct connections as required once we add
       -- support for MK-II keyboard
-      report "Bridging Xilinx MK-I keyboard signals to keyboard: "
-         & std_logic'image(kb_io1)  & std_logic'image(kb_io2);
+--      report "Bridging Xilinx MK-I keyboard signals to keyboard: "
+--         & std_logic'image(kb_io1)  & std_logic'image(kb_io2);
       k_io1 <= kb_io1; k_io1_en <= '1';
       k_io2 <= kb_io2; k_io2_en <= '1';
       kb_io3 <= k_io3;
     elsif cpld_cfg0='0' and mk1_connected='0' then
---      report "mk-ii keyboard connected";
+--      report "mk-ii connected,"
+--        & " kio1 = " & std_logic'image(k_io1)  & std_logic'image(k_io1_en) & std_logic'image(mk2_io1_en) & std_logic'image(mk2_io1)
+--        & ", kio2 = " & std_logic'image(k_io2)  & std_logic'image(k_io2_en) & std_logic'image(mk2_io2_en) & std_logic'image(mk2_io2);
       -- MK-II keyboard connected
       -- k_io2 = I2C SCL
       -- k_io1 = I2C SDA
@@ -363,8 +367,10 @@ begin
       end if;
       mk2_io2_in <= mk2_io2;
       if mk2_io2_en='1' then
+--        report "io2 drive : k_io2 <= " & std_logic'image(mk2_io2);
         k_io2 <= mk2_io2; k_io2_en <= '1';
       else
+--        report "io2 Z";
         k_io2 <= 'Z'; k_io2_en <= '0';
       end if;
 
@@ -379,15 +385,9 @@ begin
       k_tdi <= te_tdi;
       k_tms <= te_tms;
       k_tck <= te_tck;
-
     end if;
-  end process;
 
-  -- MK-II keyboard detection and operation
-  process (cpld_clk) is
-  begin
-    if rising_edge(cpld_clk) then
-      -- Detect MK-I keyboard by looking for KIO10 going high, as MK-II keyboard
+    -- Detect MK-I keyboard by looking for KIO10 going high, as MK-II keyboard
       -- holds this line forever low.  As MK-I will start with KIO10 high, we can
       -- assume MK-II keyboard, and correct our decision in 1 clock tick if it was
       -- wrong.  Doing it the other way around would cause fake key presses during
