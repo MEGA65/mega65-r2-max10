@@ -359,13 +359,13 @@ begin
       -- kb_io? should get the synthesised MK-I-style keyboard information
 
       -- Make tri-state link from keyboard connector to MK-II controller
-      mk2_io1_in <= mk2_io1;
+      mk2_io1_in <= k_io1;
       if mk2_io1_en='1' then
         k_io1 <= mk2_io1; k_io1_en <= '1';
       else
         k_io1 <= 'Z'; k_io1_en <= '0';
       end if;
-      mk2_io2_in <= mk2_io2;
+      mk2_io2_in <= k_io2;
       if mk2_io2_en='1' then
 --        report "io2 drive : k_io2 <= " & std_logic'image(mk2_io2);
         k_io2 <= mk2_io2; k_io2_en <= '1';
