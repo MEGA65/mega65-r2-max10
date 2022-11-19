@@ -95,6 +95,8 @@ ENTITY top IS
     k_jtagen : out std_logic;
     k_io1 : inout std_logic;
     k_io2 : out std_logic;
+    k_io1_en : out std_logic;
+    k_io2_en : out std_logic;
     k_io3 : in std_logic;
 
     -----------------------------------------------------------------
@@ -206,16 +208,6 @@ begin
     
     );
 
-  
-  -- XXX Use something like this for MK-II keyboard support
---  process (kio1_en, kio1_out) is
---  begin
---    if kio1_en='1' then
---      k_io1 <= kio1_out;
---    else
---      k_io1 <= 'Z';
---    end if;
---  end process;
   
   -- Make UART loopback
   dbg_uart_rx <= te_uart_tx;
@@ -349,9 +341,10 @@ begin
       -- Connect keyboard GPIO interface
       -- XXX Disable direct connections as required once we add
       -- support for MK-II keyboard
---      report "Bridging Xilinx MK-I keyboard signals to keyboard";
-      k_io1 <= kb_io1;
-      k_io2 <= kb_io2;
+      report "Bridging Xilinx MK-I keyboard signals to keyboard: "
+         & std_logic'image(kb_io1)  & std_logic'image(kb_io2);
+      k_io1 <= kb_io1; k_io1_en <= '1';
+      k_io2 <= kb_io2; k_io2_en <= '1';
       kb_io3 <= k_io3;
     elsif cpld_cfg0='0' and mk1_connected='0' then
 --      report "mk-ii keyboard connected";
@@ -364,15 +357,15 @@ begin
       -- Make tri-state link from keyboard connector to MK-II controller
       mk2_io1_in <= mk2_io1;
       if mk2_io1_en='1' then
-        k_io1 <= mk2_io1;
+        k_io1 <= mk2_io1; k_io1_en <= '1';
       else
-        k_io1 <= 'Z';
+        k_io1 <= 'Z'; k_io1_en <= '0';
       end if;
       mk2_io2_in <= mk2_io2;
       if mk2_io2_en='1' then
-        k_io2 <= mk2_io2;
+        k_io2 <= mk2_io2; k_io2_en <= '1';
       else
-        k_io2 <= 'Z';
+        k_io2 <= 'Z'; k_io2_en <= '0';
       end if;
 
       -- Connect Xilinx MK-I interface to MK-II controller
