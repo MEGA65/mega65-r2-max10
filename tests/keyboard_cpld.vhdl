@@ -91,10 +91,9 @@ ARCHITECTURE translated OF keyboard_cpld IS
   
 BEGIN
 
-  -- Generate 24MHz clock for simulating keyboard CPLD
+  -- Generate 12MHz clock for simulating keyboard CPLD
   process is
   begin
---    clk <= '0'; wait for 20.8 ns; clk <= '1'; wait for 20.8 ns;
     clk <= '0'; wait for 41.6 ns; clk <= '1'; wait for 41.6 ns;
   end process;
     

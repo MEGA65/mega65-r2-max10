@@ -27,7 +27,6 @@ end entity mk2_to_mk1;
 architecture behavioural of mk2_to_mk1 is
 
   signal output_vector : std_logic_vector(127 downto 0);
-  signal disco_vector : std_logic_vector(95 downto 0);
 
   signal i2c_counter : integer range 0 to 125 := 0;
   signal i2c_tick : std_logic := '0';
@@ -76,6 +75,20 @@ architecture behavioural of mk2_to_mk1 is
   signal upkey : std_logic;
   signal leftkey : std_logic;
   signal restore : std_logic;
+
+  signal clock_duration : integer range 0 to 248 := 0;
+
+  signal mega65_ordered_matrix : std_logic_vector(81 downto 0) := (others => '1');
+  signal serial_data_out : std_logic_vector(127 downto 0) := (others => '1');
+  signal serial_data_in : std_logic_vector(127 downto 0) := (others => '0');
+  signal bit_number : integer range 0 to 255 := 0;
+
+  signal kio8_history : std_logic_vector(3 downto 0) := "0000";
+  signal last_last_kio8 : std_logic := '0';
+  signal last_kio8 : std_logic := '0';
+  
+  constant mk2_id_commit : unsigned(31 downto 0) := x"4d4b4949"; -- "MKII" to identify keyboard model
+  constant mk2_id_date : unsigned(13 downto 0) := to_unsigned(0,14);
   
 begin  -- behavioural
 
@@ -89,6 +102,72 @@ begin  -- behavioural
 
       i2c_bit_valid <= '0';
 
+      -- De-glitch signal from FPGA
+      kio8_history(0) <= mk2_xil_io1;
+      kio8_history(3 downto 1) <= kio8_history(2 downto 0);
+
+      last_last_kio8 <= last_kio8;
+      if kio8_history(3 downto 0) = "1111" and mk2_xil_io1='1' and last_kio8 = '0' then
+        last_kio8 <= '1';
+      end if;
+      if kio8_history(3 downto 0) = "0000" and mk2_xil_io1='0' and last_kio8 = '1' then
+        last_kio8 <= '0';
+      end if;
+      
+      -- Watch for Xilinx protocol clock
+      -- At 100MHz, we need ~8x the counter values of the MK-I CPLD clock.
+      if mk2_xil_io1='0' then
+        clock_duration <= 0;
+        if clock_duration /= 0 then
+--          report "Saw half clock of duration " & integer'image(clock_duration);
+        end if;
+      else
+        if clock_duration < 248 then
+          clock_duration <= clock_duration + 1;
+        end if;
+        if clock_duration = 247 then
+          report "Saw start of 247+ cycle long sync pulse";
+        end if;
+      end if;
+
+      if clock_duration = 248 then
+        serial_data_out(127 downto 46) <= mega65_ordered_matrix;
+        -- We send bits in reverse order, so put date and version in backwards
+        for i in 0 to 13 loop
+          serial_data_out(33 + i) <= mk2_id_date(13 - i);
+        end loop;
+        for i in 0 to 31 loop
+          serial_data_out(1+i) <= mk2_id_commit(24 - ((i / 8)*8) + 7 - (i mod 8));
+        end loop;
+        bit_number <= 0;
+        mk2_xil_io3 <= '1';
+--        report "Preparing serial_data_out with ordered matrix = " & to_string(mega65_ordered_matrix);
+      else
+        if last_last_KIO8 = '0' and last_KIO8 = '1' then
+--          report "CLK from Xilinx rose";
+         -- Latch data on rising edge
+          if bit_number /= 255 then
+            bit_number <= bit_number + 1;
+          end if;
+          serial_data_in(127 downto 1) <= serial_data_in(126 downto 0);
+          serial_data_in(0) <= mk2_xil_io2;
+          if bit_number = 127 then
+            -- We have 128 bits of data, so latch the whole thing
+            output_vector(95 downto 1) <= serial_data_in(94 downto 0);
+            output_vector(0) <= mk2_xil_io2;
+          end if;
+
+          -- And push matrix data out
+          -- (And at the same time dealing with our funny time delay problem
+          -- which is why we read from element 79, but have 81 in the loop.)
+          serial_data_out(127 downto 1) <= serial_data_out(126 downto 0);
+          serial_data_out(0) <= serial_data_out(127);
+          mk2_xil_io3 <= serial_data_out(125);
+        end if;
+      end if;
+
+      
+      
       -- Generate ~400KHz I2C clock
       -- We use 2 or 3 ticks per clock, so 100MHz/(400KHz*2) = 125
       if i2c_counter < 125 then
@@ -149,8 +228,8 @@ begin  -- behavioural
       -- Stash the bits into the key matrix
       -- MK-II keyboard PCB schematics have the key assignments there.
       if i2c_bit_valid='1' then
-        report "Storing matrix bit " & integer'image(i2c_bit_num) & " = " & std_logic'image(i2c_bit)
-          & ", addr= " & to_string(std_logic_vector(addr)) & ", i2c_state = " & integer'image(i2c_state);
+--        report "Storing matrix bit " & integer'image(i2c_bit_num) & " = " & std_logic'image(i2c_bit)
+--          & ", addr= " & to_string(std_logic_vector(addr)) & ", i2c_state = " & integer'image(i2c_state);
         case addr is
           when "011" => -- U2
             case i2c_bit_num is

@@ -556,13 +556,13 @@ begin
         report "Data from keyboard is " & to_hstring(keyboard_data);
         report "Data from keyboard is " & to_string(keyboard_data);
         report "Keyboard GIT commit is " & to_hstring(Reverse(keyboard_data(33 downto 2)));
-        if Reverse(keyboard_data(33 downto 2)) /= x"12345678" then
-          assert false report "GIT commit should have been 12345678";
+        if Reverse(keyboard_data(33 downto 2)) /= x"4d4b4949" then
+          assert false report "GIT commit should have been 4d4b4949";
         end if;
         report "Keyboard GIT date is " & integer'image(to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))))
           & " days after keyboard epoch";
-        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 9876 then
-          assert false report "GIT date should have been 9876";
+        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 0 then
+          assert false report "GIT date should have been 0";
         end if;
         report "LED status is: "
           & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
@@ -632,13 +632,13 @@ begin
         report "Data from keyboard is " & to_hstring(keyboard_data);
         report "Data from keyboard is " & to_string(keyboard_data);
         report "Keyboard GIT commit is " & to_hstring(Reverse(keyboard_data(33 downto 2)));
-        if Reverse(keyboard_data(33 downto 2)) /= x"12345678" then
-          assert false report "GIT commit should have been 12345678";
+        if Reverse(keyboard_data(33 downto 2)) /= x"4d4b4949" then
+          assert false report "GIT commit should have been 4d4b4949";
         end if;
         report "Keyboard GIT date is " & integer'image(to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))))
           & " days after keyboard epoch";
-        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 9876 then
-          assert false report "GIT date should have been 9876";
+        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 0 then
+          assert false report "GIT date should have been 0";
         end if;
         report "LED status is: "
           & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
