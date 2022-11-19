@@ -359,15 +359,12 @@ begin
       k_io2 <= kb_io2; k_io2_en <= '1';
       kb_io3 <= k_io3;
     elsif cpld_cfg0='0' and mk1_connected='0' then
---      report "mk-ii connected,"
---        & " kio1 = " & std_logic'image(k_io1)  & std_logic'image(k_io1_en) & std_logic'image(mk2_io1_en) & std_logic'image(mk2_io1)
---        & ", kio2 = " & std_logic'image(k_io2)  & std_logic'image(k_io2_en) & std_logic'image(mk2_io2_en) & std_logic'image(mk2_io2);
       -- MK-II keyboard connected
-      -- k_io2 = I2C SCL
-      -- k_io1 = I2C SDA
-      -- k_io3 = held low
-      -- kb_io? should get the synthesised MK-I-style keyboard information
 
+      te_tdo <= fpga_tdo;
+      -- And connect keyboard to Xilinx FPGA, and turn off JTAG mode for it
+      k_jtagen <= '0';
+      
       -- Make tri-state link from keyboard connector to MK-II controller
       mk2_io1_in <= k_io1;
       if mk2_io1_en='1' then
