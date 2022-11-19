@@ -238,7 +238,7 @@ begin
 					when write_bit =>
 						if scl_falling_edge then
                                                   sda_out <= output_shift(7);
-                                                  report "outputting bit = " & std_logic'image(output_shift(7));
+--                                                  report "outputting bit = " & std_logic'image(output_shift(7));
 							write_timeout_counter <= write_timeout;
 							write_state <= wait_scl_rising;
 						end if;
@@ -263,7 +263,7 @@ begin
 							write_state <= write_end;
 						end if;
                                   when write_end =>
-                                          report "write_end: releasing SDA";
+--                                          report "write_end: releasing SDA";
 						sda_out <= '1';
 						if (not write_ack) and (not write_byte) then
 							write_state <= idle;
