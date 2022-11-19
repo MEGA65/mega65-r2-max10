@@ -511,6 +511,147 @@ begin
             end if;
           end if;
         end loop;
+      elsif run("MAX10 MK-II keyboard doesn't cause KIO10 to stay low") then
+        output_vector(127 downto 96) <= (others => '0');
+        -- Power LEDs
+        output_vector(95 downto 72) <= x"FFFFFF";
+        output_vector(71 downto 48) <= x"000000";
+        -- Floppy LEDs
+        output_vector(47 downto 24) <= x"ffffff";
+        output_vector(23 downto 0) <= x"000000";
+
+        -- Connect the MK-II keyboard instead
+        mk1_connected <= '0';
+
+        -- Pretend to be Xilinx FPGA driving the process
+        -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
+        -- per clock phase
+        for s in 1 to 2 loop
+          report "cycle";
+          for i in 0 to 140 loop
+            if i < 128 then
+              -- Data bits
+              kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
+              kb_io1 <= '1'; wait for 1580 ns;
+              keyboard_data(127-i) <= k_io3;
+            else
+              kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
+              kb_io1 <= '1'; wait for 1580 ns;              
+            end if;
+          end loop;
+        end loop;
+        report "Data from keyboard is " & to_hstring(keyboard_data);
+        report "Data from keyboard is " & to_string(keyboard_data);
+        report "Keyboard GIT commit is " & to_hstring(Reverse(keyboard_data(33 downto 2)));
+        if Reverse(keyboard_data(33 downto 2)) /= x"12345678" then
+          assert false report "GIT commit should have been 12345678";
+        end if;
+        report "Keyboard GIT date is " & integer'image(to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))))
+          & " days after keyboard epoch";
+        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 9876 then
+          assert false report "GIT date should have been 9876";
+        end if;
+        report "LED status is: "
+          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
+          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
+          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
+          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          ;
+        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
+          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
+          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
+          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+          assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
+        end if;
+        for i in 127 downto 50 loop
+          if to_X01(keyboard_data(i)) /= '1' then
+            assert false report "all keys should be released, but matrix position " & integer'image(i-50)
+              & " was not high.";
+          end if;
+        end loop;
+      elsif run("MK-II keyboard key press communicated to main FPGA") then
+        -- Either way, we expect valid MK-I keyboard traffic from the MAX10:
+        -- for MK-I keyboards it is transparently relayed. For MK-II keyboards
+        -- the MAX10 does the protocol conversion.
+        --
+        -- The protocol for MK-I keyboard is:
+        -- KIO8 = clock/sync from FPGA to keyboard
+        -- KIO9 = output from FPGA to keyboard
+        -- KIO10 = input from keyboard to FPGA
+        -- The protocol sends a 128 bit string in this way.
+        -- 24 bits of RGB for each of the four LEDs = 96 bits.
+        -- The remaining bits are reserved
+        -- Data is sent MSB first
+        -- For testing, we will set it to have 2 LEDs on, and 2 off, so that we
+        -- can check the reflected LED settings
+        -- Total sequence is 140 counts long, with 128 data ticks and a sync pulse
+        -- that lasts the rest of the duration
+        output_vector(127 downto 96) <= (others => '0');
+        -- Power LEDs
+        output_vector(95 downto 72) <= x"FFFFFF";
+        output_vector(71 downto 48) <= x"000000";
+        -- Floppy LEDs
+        output_vector(47 downto 24) <= x"ffffff";
+        output_vector(23 downto 0) <= x"000000";
+
+        mk1_connected <= '0';
+        
+        -- UP key held down
+        key_CURSORUP <= '0';
+        
+        -- Pretend to be Xilinx FPGA driving the process
+        -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec
+        -- per clock phase
+        for s in 1 to 2 loop
+          report "cycle";
+          for i in 0 to 140 loop
+            if i < 128 then
+              -- Data bits
+              kb_io1 <= '0'; kb_io2 <= output_vector(127-i); wait for 1580 ns;
+              kb_io1 <= '1'; wait for 1580 ns;
+              keyboard_data(127-i) <= k_io3;
+            else
+              kb_io1 <= '1'; wait for 1580 ns; kb_io2 <= '1';
+              kb_io1 <= '1'; wait for 1580 ns;              
+            end if;
+          end loop;
+        end loop;
+        report "Data from keyboard is " & to_hstring(keyboard_data);
+        report "Data from keyboard is " & to_string(keyboard_data);
+        report "Keyboard GIT commit is " & to_hstring(Reverse(keyboard_data(33 downto 2)));
+        if Reverse(keyboard_data(33 downto 2)) /= x"12345678" then
+          assert false report "GIT commit should have been 12345678";
+        end if;
+        report "Keyboard GIT date is " & integer'image(to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))))
+          & " days after keyboard epoch";
+        if to_integer(unsigned(Reverse(keyboard_data(47 downto 34)))) /= 9876 then
+          assert false report "GIT date should have been 9876";
+        end if;
+        report "LED status is: "
+          & std_logic'image(LED_R0) & std_logic'image(LED_G0) & std_logic'image(LED_B0)
+          & std_logic'image(LED_R1) & std_logic'image(LED_G1) & std_logic'image(LED_B1)
+          & std_logic'image(LED_R2) & std_logic'image(LED_G2) & std_logic'image(LED_B2)
+          & std_logic'image(LED_R3) & std_logic'image(LED_G3) & std_logic'image(LED_B3)
+          ;
+        if LED_R0/='1' or LED_G0/='1' or LED_B0/='1'
+          or LED_R1/='0' or LED_G1/='0' or LED_B1/='0'                 
+          or LED_R2/='1' or LED_G2/='1' or LED_B2/='1'                 
+          or LED_R3/='0' or LED_G3/='0' or LED_B3/='0' then
+          assert false report "LED 0,2 should have RGB=1, and LED1,3 should have RGB=0";
+        end if;
+        for i in 2 to 79 loop
+          if i /= 73 then
+            if to_X01(keyboard_data(129 - i)) /= '1' then
+              assert false report "other keys should be released, but matrix position " & integer'image(i)
+                & " was not high.";
+            end if;
+          else
+            if to_X01(keyboard_data(129 - i)) /= '0' then
+              assert false report "selected key(s) should be down, but matrix position " & integer'image(i)
+                & " was not low.";
+            end if;
+          end if;
+        end loop;
       end if;
     end loop;
     test_runner_cleanup(runner);
