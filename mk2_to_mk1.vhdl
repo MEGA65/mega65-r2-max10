@@ -111,6 +111,8 @@ architecture behavioural of mk2_to_mk1 is
   signal caps_lock_hold_time : integer range 0 to 1*512 := 0;
   signal caps_lock : std_logic := '0'; -- active high
 
+  signal cnt_idle : unsigned(31 downto 0) := to_unsigned(0,32);
+  
 begin  -- behavioural
 
   process (clock50)
@@ -129,6 +131,28 @@ begin  -- behavioural
         counter <= 0;
         u1_reg6 <= '1';
         u1_active <= '0';
+      end if;
+
+      -- Flash both leds like ambulance lights if no signal from the computer
+      if cnt_idle(31 downto 25) /= "0000000" then
+        output_vector(95 downto 0) <= (others => '0');
+
+        -- XXX For R3 PCB, we have back-flow current via HDMI, which has enough
+        -- voltage to cause the red LEDs to be able to light (and to power this
+        -- entire CPLD!). To hide this, we will make ambulance mode have only
+        -- blue LED flashing.
+        if cnt_idle(24)='1' then
+          -- Red flashes
+          -- mega65_control_data(7 downto 0) <= (others => cnt_idle(20));
+          -- mega65_control_data(31 downto 24) <= (others => cnt_idle(20));
+          -- Blue flashes
+          output_vector(23 downto 16) <= (others => cnt_idle(21));
+          output_vector(47 downto 40) <= (others => cnt_idle(21));
+        else
+          -- Blue flashes
+          output_vector(71 downto 64) <= (others => cnt_idle(21));
+          output_vector(95 downto 88) <= (others => cnt_idle(21));
+        end if;
       end if;
       
       -- Export LEDs for debugging
@@ -201,6 +225,7 @@ begin  -- behavioural
             v(95 downto 1) := unsigned(serial_data_in(94 downto 0));
             v(0) := mk2_xil_io2;
             report "Setting output_vector to $" & string'(to_hexstring(unsigned'(v)));
+            cnt_idle <= to_unsigned(0,32);
           end if;
 
           -- And push matrix data out
@@ -257,18 +282,18 @@ begin  -- behavioural
         led1_r <= '1'; led1_g <= '1'; led1_b <= '1';
         led2_r <= '1'; led2_g <= '1'; led2_b <= '1';
         led3_r <= '1'; led3_g <= '1'; led3_b <= '1';
-        if to_integer(unsigned(output_vector(7 downto 4))) > led_counter then led0_r <= '0'; report "red0"; end if;
-        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led0_g <= '0'; report "green0"; end if;
-        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led0_b <= '0'; report "blue0"; end if;
-        if to_integer(unsigned(output_vector(31 downto 24))) > led_counter then led1_r <= '0'; report "red1"; end if;
-        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led1_g <= '0'; report "green1"; end if;
-        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led1_b <= '0'; report "blue1"; end if;
-        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led2_r <= '0'; report "red2"; end if;
-        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led2_g <= '0'; report "green2"; end if;
-        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led2_b <= '0'; report "blue2"; end if;
-        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led3_r <= '0'; report "red3"; end if;
-        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led3_g <= '0'; report "green3"; end if;
-        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led3_b <= '0'; report "blue3"; end if;
+        if to_integer(unsigned(output_vector(7 downto 4))) > led_counter then led3_r <= '0'; report "red0"; end if;
+        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led3_g <= '0'; report "green0"; end if;
+        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led3_b <= '0'; report "blue0"; end if;
+        if to_integer(unsigned(output_vector(31 downto 24))) > led_counter then led2_r <= '0'; report "red1"; end if;
+        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led2_g <= '0'; report "green1"; end if;
+        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led2_b <= '0'; report "blue1"; end if;
+        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led1_r <= '0'; report "red2"; end if;
+        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led1_g <= '0'; report "green2"; end if;
+        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led1_b <= '0'; report "blue2"; end if;
+        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led0_r <= '0'; report "red3"; end if;
+        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led0_g <= '0'; report "green3"; end if;
+        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led0_b <= '0'; report "blue3"; end if;
 
         led_shiftlock <= shiftlock_toggle;
         led_capslock <= not caps_lock;
@@ -539,24 +564,24 @@ begin  -- behavioural
           when 559 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 560 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_b and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 561 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 562 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 563 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 564 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 565 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 566 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 567 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 562 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 563 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 564 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 565 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 566 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 567 => mk2_io1 <= '0'; mk2_io1_en <= not (led1_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 568 => mk2_io1 <= '0'; mk2_io1_en <= not (led_capslock and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 569 => mk2_io1 <= '0'; mk2_io1_en <= not (led_capslock and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 570 => mk2_io1 <= '0'; mk2_io1_en <= not (led_capslock and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 571 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 572 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_b and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 573 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 574 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 575 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 576 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 577 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 578 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 579 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 574 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 575 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 576 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 577 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 578 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 579 => mk2_io1 <= '0'; mk2_io1_en <= not (led0_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           -- Send ACK bit during write
           when 580 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 581 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
@@ -569,24 +594,24 @@ begin  -- behavioural
           when 586 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 587 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_b and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 588 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 589 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 590 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 591 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 592 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 593 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 594 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 589 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 590 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 591 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 592 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 593 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 594 => mk2_io1 <= '0'; mk2_io1_en <= not (led3_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 595 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 596 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 597 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 598 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 599 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_b and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 600 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_b and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 601 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 602 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 603 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 604 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 605 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 606 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 601 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 602 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 603 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_r and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 604 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 605 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 606 => mk2_io1 <= '0'; mk2_io1_en <= not (led2_g and u1_active); mk2_io2 <= '0'; mk2_io2_en <= '1';
           -- Send ACK bit during write
           when 607 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 608 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
