@@ -91,11 +91,6 @@ signal output_vector : std_logic_vector(127 downto 0);
 
   signal sda_assert : std_logic := '0';
 
-  signal returnkey : std_logic;
-  signal upkey : std_logic;
-  signal leftkey : std_logic;
-  signal restore : std_logic;
-
   signal clock_duration : integer range 0 to 248 := 0;
 
   signal mega65_ordered_matrix : std_logic_vector(81 downto 0) := (others => '1');
@@ -283,14 +278,14 @@ begin  -- behavioural
               when 6 => current_keys(48) <= i2c_bit;-- GBP
               when 7 => current_keys(43) <= i2c_bit;-- MINUS
               -- NONE of the following work right now
-              when 15 => current_keys(41) <= i2c_bit;-- P
-              when 14 => current_keys(38) <= i2c_bit;-- O
-              when 13 => current_keys(33) <= i2c_bit;-- I
-              when 12 => current_keys(30) <= i2c_bit;-- U
-              when 11 => current_keys(40) <= i2c_bit;-- PLUS
-              when 10 => current_keys(35) <= i2c_bit;-- ZERO
-              when  9 => current_keys(6) <= i2c_bit;-- F5
-              when  8 => current_keys(3) <= i2c_bit;-- F7
+              when  8 => current_keys(41) <= i2c_bit;-- P
+              when  9 => current_keys(38) <= i2c_bit;-- O
+              when 10 => current_keys(33) <= i2c_bit;-- I
+              when 11 => current_keys(30) <= i2c_bit;-- U
+              when 12 => current_keys(40) <= i2c_bit;-- PLUS
+              when 13 => current_keys(35) <= i2c_bit;-- ZERO
+              when 14 => current_keys(6) <= i2c_bit;-- F5
+              when 15 => current_keys(3) <= i2c_bit;-- F7
               when others => null;
             end case;
 
@@ -324,8 +319,8 @@ begin  -- behavioural
             report "i2c bit #" & integer'image(i2c_bit_num) & " = " & std_logic'image(i2c_bit);
             case i2c_bit_num is
               -- Order was reversed
-              when 7 => current_keys(47) <= i2c_bit;-- <
-              when 6 => current_keys(44) <= i2c_bit;-- >
+              when 7 => current_keys(44) <= i2c_bit;-- <
+              when 6 => current_keys(47) <= i2c_bit;-- >
               when 5 => current_keys(31) <= i2c_bit;-- V
               when 4 => current_keys(28) <= i2c_bit;-- B
               when 3 => current_keys(39) <= i2c_bit;-- N
@@ -353,13 +348,7 @@ begin  -- behavioural
               when 5 => -- duplicate of >
               when 4 => -- duplucate of <
               when 3 => current_keys(74) <= i2c_bit;-- LEFT
-                        -- XXX need to be delayed until we have
-                        -- exported RSHIFT
-                        leftkey <= not i2c_bit;
               when 2 => current_keys(73) <= i2c_bit;-- UP
-                        -- XXX need to be delayed until we have
-                        -- exported RSHIFT
-                        upkey <= not i2c_bit;
               when 1 => current_keys(7) <= i2c_bit;-- DOWN
               when 0 => current_keys(2) <= i2c_bit;-- RIGHT
               -- Reversed, but not all working
@@ -367,14 +356,12 @@ begin  -- behavioural
               when 14 => current_keys(50) <= i2c_bit;-- ;
               when 13 => current_keys(53) <= i2c_bit;-- =
               when 12 => current_keys(1) <= i2c_bit;-- RETURN
-                         returnkey <= i2c_bit;
                          -- Copied from MK-I keyboard behaviour
                          current_keys(77) <= i2c_bit;
               when 11 => current_keys(46) <= i2c_bit;-- @
               when 10 => current_keys(49) <= i2c_bit;-- * 
               when  9 => current_keys(54) <= i2c_bit;-- ^
               when  8 => current_keys(75) <= i2c_bit;-- RESTORE
-                         restore <= i2c_bit;
               when others => null;
             end case;
 
@@ -693,37 +680,40 @@ begin  -- behavioural
           when 202 => mk2_io2 <= '1'; mk2_io2_en <= '1';
           when 203 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 1; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 204 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
-          when 205 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 0; mk2_io2 <= '0'; mk2_io2_en <= '1';   -- ack byte read
+          when 205 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
+          when 206 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 0; mk2_io2 <= '0'; mk2_io2_en <= '1';   -- ack byte read
                       -- Now we need to release SDA immediately, rather than
                       -- waiting 1 bit time, but only after we have pulled
                       -- SCL low.
                       sda_assert <= '1';
-          when 206 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 207 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
                       
-          when 207 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 208 => mk2_io2 <= '0'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
-          when 209 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 15; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 210 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 211 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 14; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 212 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 213 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 13; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 214 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 215 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 12; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 216 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 217 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 11; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 218 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 219 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 10; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 220 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
-          when 221 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 9; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 222 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0'; -- don't ack last byte read
-          when 223 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 8; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; 
-          when 224 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 208 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 209 => mk2_io2 <= '0'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
+          when 210 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '0';
+          when 211 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '0';
+          when 212 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 15; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 213 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 214 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 14; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 215 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 216 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 13; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 217 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 218 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 12; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 219 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 220 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 11; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 221 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 222 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 10; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 223 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
+          when 224 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 9; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 225 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0'; -- don't ack last byte read
+          when 226 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 8; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; 
+          when 227 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '1';
                       
           -- Send STOP at end of read
-          when 225 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; -- don't ack last byte read
-          when 226 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 227 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
-          when 228 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 228 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1'; -- don't ack last byte read
+          when 229 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
+          when 230 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
+          when 231 => mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '1'; mk2_io2_en <= '1';
                       i2c_state <= 0;
           when others => null;
         end case;
