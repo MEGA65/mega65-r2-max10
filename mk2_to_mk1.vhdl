@@ -45,7 +45,7 @@ end entity mk2_to_mk1;
 
 architecture behavioural of mk2_to_mk1 is
 
-signal output_vector : std_logic_vector(127 downto 0);
+  signal output_vector : std_logic_vector(127 downto 0);
 
   signal i2c_counter : integer range 0 to 63 := 0;
   signal i2c_tick : std_logic := '0';
@@ -78,8 +78,8 @@ signal output_vector : std_logic_vector(127 downto 0);
   signal led3_r : std_logic := '0';
   signal led3_g : std_logic := '0';
   signal led3_b : std_logic := '0';
-  signal led_capslock : std_logic := '0';
-  signal led_shiftlock : std_logic := '0';
+  signal led_capslock : std_logic := '1';
+  signal led_shiftlock : std_logic := '1';
   
   signal led_tick : std_logic := '0';
   signal led_counter : integer range 0 to 15 := 0;
@@ -104,7 +104,13 @@ signal output_vector : std_logic_vector(127 downto 0);
   
   constant mk2_id_commit : unsigned(31 downto 0) := x"4d4b4949"; -- "MKII" to identify keyboard model
   constant mk2_id_date : unsigned(13 downto 0) := to_unsigned(0,14);
-  
+
+  signal counter : integer := 0;
+
+  signal last_caps_lock : std_logic_vector(7 downto 0) := (others => '1');
+  signal caps_lock_hold_time : integer range 0 to 1*512 := 0;
+  signal caps_lock : std_logic := '0'; -- active high
+
 begin  -- behavioural
 
   process (clock50)
@@ -115,6 +121,16 @@ begin  -- behavioural
   begin
     if rising_edge(clock50) then
 
+      -- Periodically re-initialise U1, so that if keyboard is hot-swapped,
+      -- LEDs still work (really just to make my life easier during development)
+      if counter < 50_000_000 then
+        counter <= counter + 1;
+      else
+        counter <= 0;
+        u1_reg6 <= '1';
+        u1_active <= '0';
+      end if;
+      
       -- Export LEDs for debugging
       LED_R0 <= led0_r; LED_G0 <= led0_g; LED_B0 <= led0_b;
       LED_R1 <= led1_r; LED_G1 <= led1_g; LED_B1 <= led1_b;
@@ -254,7 +270,8 @@ begin  -- behavioural
         if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led3_g <= '1'; report "green3"; end if;
         if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led3_b <= '1'; report "blue3"; end if;
 
-        led_shiftlock <= not shiftlock_toggle;
+        led_shiftlock <= shiftlock_toggle;
+        led_capslock <= not caps_lock;
       end if;
 
       -- Stash the bits into the key matrix
@@ -379,10 +396,38 @@ begin  -- behavioural
               -- Seemingly not working
                         -- Probably reversed, as NOSCROLL does 3
               when 15 => current_keys(64) <= i2c_bit;-- NOSCROLL
-              when 14 => current_keys(72) <= i2c_bit;-- CAPSLOCK
-                        -- XXX need to cancel/toggle CAPSLOCK when held for
-                        -- fast-key behaviour
-                        LED_CAPS <= i2c_bit;
+              when 14 => -- CAPS LOCK
+                -- Directly expose up/down state of CAPS LOCK key for
+                -- use as turbo button
+                current_keys(78) <= i2c_bit;
+
+                current_keys(72) <= not caps_lock;
+
+                -- Toggle CAPS LOCK each time it is pressed.
+                -- Toggle again, if held for a long time, so that
+                -- a long-press for turbo mode, doesn't require that
+                -- the user then cancel the CAPS LOCK change that pressing
+                -- it caused.
+                last_caps_lock(0) <= i2c_bit;
+                last_caps_lock(7 downto 1) <= last_caps_lock(6 downto 0);
+                if last_caps_lock = x"00" then
+                  -- If caps lock is being held down for a long time for CPU speed
+                  -- control, then automatically re-invert it so that the user doesn't
+                  -- need to do so themselves.
+                  if caps_lock_hold_time < (1*512) then
+                    caps_lock_hold_time <= caps_lock_hold_time + 1;
+                  end if;
+                  if caps_lock_hold_time = (1*512 - 2) then
+                    caps_lock <= not caps_lock;
+                  end if;
+                else
+                  caps_lock_hold_time <= 0;
+                end if;
+                if (i2c_bit='0') and (last_caps_lock=x"FF") then
+                  caps_lock <= not caps_lock;
+                  current_keys(72) <= not caps_lock;
+                end if;
+
               when 13 => current_keys(66) <= i2c_bit;-- ALT
               when 12 => current_keys(71) <= i2c_bit;-- ESC
               when 11 => current_keys(63) <= i2c_bit;-- RUNSTOP
