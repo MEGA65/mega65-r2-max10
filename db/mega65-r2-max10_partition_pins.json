@@ -68,6 +68,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "k_io2_en",
+					"strict" : false
+				},
+				{
 					"name" : "mk2_LED_R0",
 					"strict" : false
 				},
@@ -204,6 +208,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "k_io3",
+					"strict" : false
+				},
+				{
 					"name" : "k_tdo",
 					"strict" : false
 				},
@@ -217,10 +225,6 @@
 				},
 				{
 					"name" : "xilinx_sync",
-					"strict" : false
-				},
-				{
-					"name" : "k_io3",
 					"strict" : false
 				},
 				{

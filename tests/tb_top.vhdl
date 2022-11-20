@@ -812,7 +812,7 @@ begin
         mk1_connected <= '0';
         
         -- SPACE key held down
-        u4port1(7) <= '0';
+        u4port1(0) <= '0';
         
         -- Pretend to be Xilinx FPGA driving the process
         -- FPGA drives signal at 40.5MHz / 64 / 2 half-clocks = 1.58 usec

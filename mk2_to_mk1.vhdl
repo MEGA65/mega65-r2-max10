@@ -134,20 +134,24 @@ begin  -- behavioural
       end if;
 
       -- Flash both leds like ambulance lights if no signal from the computer
+      cnt_idle <= cnt_idle + 1;
       if cnt_idle(31 downto 25) /= "0000000" then
         output_vector(95 downto 0) <= (others => '0');
 
-        -- XXX For R3 PCB, we have back-flow current via HDMI, which has enough
-        -- voltage to cause the red LEDs to be able to light (and to power this
-        -- entire CPLD!). To hide this, we will make ambulance mode have only
-        -- blue LED flashing.
+        -- For R3/R3A PCB, we have back-flow current via HDMI, which has enough
+        -- voltage to cause the red LEDs to be able to light (and to power the
+        -- entire Lattice CPLD in the MK-I keyboard!). To hide this, we will make
+        -- ambulance mode have only blue LED flashing, because of their higher
+        -- minimum voltage requirement.
+        -- BUT for MK-II keyboard which is controlled via the MAX10 or another
+        -- FPGA on the mainboard, this should no longer be a problem.
         if cnt_idle(24)='1' then
           -- Red flashes
-          -- mega65_control_data(7 downto 0) <= (others => cnt_idle(20));
-          -- mega65_control_data(31 downto 24) <= (others => cnt_idle(20));
+          output_vector(7 downto 0) <= (others => cnt_idle(21));
+          output_vector(31 downto 24) <= (others => cnt_idle(21));
           -- Blue flashes
-          output_vector(23 downto 16) <= (others => cnt_idle(21));
-          output_vector(47 downto 40) <= (others => cnt_idle(21));
+--          output_vector(23 downto 16) <= (others => cnt_idle(21));
+--          output_vector(47 downto 40) <= (others => cnt_idle(21));
         else
           -- Blue flashes
           output_vector(71 downto 64) <= (others => cnt_idle(21));
@@ -283,17 +287,17 @@ begin  -- behavioural
         led2_r <= '1'; led2_g <= '1'; led2_b <= '1';
         led3_r <= '1'; led3_g <= '1'; led3_b <= '1';
         if to_integer(unsigned(output_vector(7 downto 4))) > led_counter then led3_r <= '0'; report "red0"; end if;
-        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led3_g <= '0'; report "green0"; end if;
-        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led3_b <= '0'; report "blue0"; end if;
+        if to_integer(unsigned(output_vector(15 downto 12))) > led_counter then led3_b <= '0'; report "green0"; end if;
+        if to_integer(unsigned(output_vector(23 downto 20))) > led_counter then led3_g <= '0'; report "blue0"; end if;
         if to_integer(unsigned(output_vector(31 downto 24))) > led_counter then led2_r <= '0'; report "red1"; end if;
-        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led2_g <= '0'; report "green1"; end if;
-        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led2_b <= '0'; report "blue1"; end if;
-        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led1_r <= '0'; report "red2"; end if;
-        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led1_g <= '0'; report "green2"; end if;
-        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led1_b <= '0'; report "blue2"; end if;
-        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led0_r <= '0'; report "red3"; end if;
-        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led0_g <= '0'; report "green3"; end if;
-        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led0_b <= '0'; report "blue3"; end if;
+        if to_integer(unsigned(output_vector(39 downto 36))) > led_counter then led2_b <= '0'; report "green1"; end if;
+        if to_integer(unsigned(output_vector(47 downto 44))) > led_counter then led2_g <= '0'; report "blue1"; end if;
+        if to_integer(unsigned(output_vector(55 downto 52))) > led_counter then led1_b <= '0'; report "red2"; end if;
+        if to_integer(unsigned(output_vector(63 downto 60))) > led_counter then led1_r <= '0'; report "green2"; end if;
+        if to_integer(unsigned(output_vector(71 downto 68))) > led_counter then led1_g <= '0'; report "blue2"; end if;
+        if to_integer(unsigned(output_vector(79 downto 76))) > led_counter then led0_b <= '0'; report "red3"; end if;
+        if to_integer(unsigned(output_vector(87 downto 84))) > led_counter then led0_r <= '0'; report "green3"; end if;
+        if to_integer(unsigned(output_vector(95 downto 92))) > led_counter then led0_g <= '0'; report "blue3"; end if;
 
         led_shiftlock <= shiftlock_toggle;
         led_capslock <= not caps_lock;
