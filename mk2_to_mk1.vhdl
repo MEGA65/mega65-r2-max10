@@ -389,7 +389,7 @@ begin  -- behavioural
               when 2 => current_keys(32) <= i2c_bit;-- 9
               when 1 => current_keys(5) <= i2c_bit;-- F3
               when 0 => current_keys(4) <= i2c_bit;-- F1
-                        -- Seemingly not working
+              -- Seemingly not working
                         -- Probably reversed, as NOSCROLL does 3
               when 15 => current_keys(64) <= i2c_bit;-- NOSCROLL
               when 14 => current_keys(72) <= i2c_bit;-- CAPSLOCK
@@ -701,7 +701,7 @@ begin  -- behavioural
           when 206 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '1'; mk2_io2_en <= '1';
                       
           when 207 => mk2_io1 <= '0'; mk2_io1_en <= '1'; mk2_io2 <= '0'; mk2_io2_en <= '1';
-          when 208 => mk2_io2 <= '1'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
+          when 208 => mk2_io2 <= '0'; mk2_io2_en <= '1'; mk2_io1 <= '1'; mk2_io1_en <= '0';
           when 209 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 15; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
           when 210 => mk2_io2 <= '1'; mk2_io2_en <= '1'; 
           when 211 => i2c_bit <= mk2_io1_in; i2c_bit_valid <= '1'; i2c_bit_num <= 14; mk2_io1 <= '1'; mk2_io1_en <= '0'; mk2_io2 <= '0'; mk2_io2_en <= '1';
