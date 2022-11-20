@@ -302,10 +302,10 @@ begin  -- behavioural
               when 3 => current_keys(65) <= i2c_bit;-- TAB
               when 2 => current_keys(62) <= i2c_bit;-- Q
               when 1 => current_keys(9) <= i2c_bit;-- W
-              when 0 => current_keys(14) <= i2c_bit;-- E
-              -- NONE of these seem to work
-              when 15 => kbd_gpio1 <= i2c_bit;-- GPIO1
-              when 14 => kbd_gpio2 <= i2c_bit;-- GPIO2
+              when 0 => -- NOT CONNECTED
+              
+              when 15 => current_keys(57) <= i2c_bit;-- <- / LEFT ARROW / LARR / _
+              when 14 => current_keys(14) <= i2c_bit;-- E
               when 13 => current_keys(58) <= i2c_bit;-- CTRL
               when 12 => current_keys(61) <= i2c_bit;-- MEGA
               when 11 => current_keys(15) <= i2c_bit and shiftlock_toggle;-- LSHIFT
@@ -345,8 +345,8 @@ begin  -- behavioural
               -- Order was reversed
               when 7 => current_keys(52) <= i2c_bit;-- RSHIFT
               when 6 => current_keys(55) <= i2c_bit;-- ?
-              when 5 => -- duplicate of >
-              when 4 => -- duplucate of <
+              when 5 => kbd_gpio2 <= i2c_bit;-- GPIO2
+              when 4 => kbd_gpio1 <= i2c_bit;-- GPIO1
               when 3 => current_keys(74) <= i2c_bit;-- LEFT
               when 2 => current_keys(73) <= i2c_bit;-- UP
               when 1 => current_keys(7) <= i2c_bit;-- DOWN
