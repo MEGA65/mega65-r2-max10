@@ -283,14 +283,14 @@ begin  -- behavioural
               when 6 => current_keys(48) <= i2c_bit;-- GBP
               when 7 => current_keys(43) <= i2c_bit;-- MINUS
               -- NONE of the following work right now
-              when 8 => current_keys(41) <= i2c_bit;-- P
-              when 9 => current_keys(38) <= i2c_bit;-- O
-              when 10 => current_keys(33) <= i2c_bit;-- I
-              when 11 => current_keys(30) <= i2c_bit;-- U
-              when 12 => current_keys(40) <= i2c_bit;-- PLUS
-              when 13 => current_keys(35) <= i2c_bit;-- ZERO
-              when 14 => current_keys(6) <= i2c_bit;-- F5
-              when 15 => current_keys(3) <= i2c_bit;-- F7
+              when 15 => current_keys(41) <= i2c_bit;-- P
+              when 14 => current_keys(38) <= i2c_bit;-- O
+              when 13 => current_keys(33) <= i2c_bit;-- I
+              when 12 => current_keys(30) <= i2c_bit;-- U
+              when 11 => current_keys(40) <= i2c_bit;-- PLUS
+              when 10 => current_keys(35) <= i2c_bit;-- ZERO
+              when  9 => current_keys(6) <= i2c_bit;-- F5
+              when  8 => current_keys(3) <= i2c_bit;-- F7
               when others => null;
             end case;
 
@@ -309,14 +309,14 @@ begin  -- behavioural
               when 1 => current_keys(9) <= i2c_bit;-- W
               when 0 => current_keys(14) <= i2c_bit;-- E
               -- NONE of these seem to work
-              when 8 => kbd_gpio1 <= i2c_bit;-- GPIO1
-              when 9 => kbd_gpio2 <= i2c_bit;-- GPIO2
-              when 10 => current_keys(58) <= i2c_bit;-- CTRL
-              when 11 => current_keys(61) <= i2c_bit;-- MEGA
-              when 12 => current_keys(15) <= i2c_bit and shiftlock_toggle;-- LSHIFT
-              when 13 => current_keys(12) <= i2c_bit;-- Z
-              when 14 => current_keys(23) <= i2c_bit;-- X
-              when 15 => current_keys(20) <= i2c_bit;-- C
+              when 15 => kbd_gpio1 <= i2c_bit;-- GPIO1
+              when 14 => kbd_gpio2 <= i2c_bit;-- GPIO2
+              when 13 => current_keys(58) <= i2c_bit;-- CTRL
+              when 12 => current_keys(61) <= i2c_bit;-- MEGA
+              when 11 => current_keys(15) <= i2c_bit and shiftlock_toggle;-- LSHIFT
+              when 10 => current_keys(12) <= i2c_bit;-- Z
+              when  9 => current_keys(23) <= i2c_bit;-- X
+              when  8 => current_keys(20) <= i2c_bit;-- C
               when others => null;
             end case;
 
@@ -362,18 +362,18 @@ begin  -- behavioural
                         upkey <= not i2c_bit;
               when 1 => current_keys(7) <= i2c_bit;-- DOWN
               when 0 => current_keys(2) <= i2c_bit;-- RIGHT
-              -- SUSPECT these are reversed, but generally not working
-              when 8 => current_keys(45) <= i2c_bit;-- :
-              when 9 => current_keys(50) <= i2c_bit;-- ;
-              when 10 => current_keys(53) <= i2c_bit;-- =
-              when 11 => current_keys(1) <= i2c_bit;-- RETURN
+              -- Reversed, but not all working
+              when 15 => current_keys(45) <= i2c_bit;-- :
+              when 14 => current_keys(50) <= i2c_bit;-- ;
+              when 13 => current_keys(53) <= i2c_bit;-- =
+              when 12 => current_keys(1) <= i2c_bit;-- RETURN
                          returnkey <= i2c_bit;
                          -- Copied from MK-I keyboard behaviour
                          current_keys(77) <= i2c_bit;
-              when 12 => current_keys(46) <= i2c_bit;-- @
-              when 13 => current_keys(49) <= i2c_bit;-- * 
-              when 14 => current_keys(54) <= i2c_bit;-- ^
-              when 15 => current_keys(75) <= i2c_bit;-- RESTORE
+              when 11 => current_keys(46) <= i2c_bit;-- @
+              when 10 => current_keys(49) <= i2c_bit;-- * 
+              when  9 => current_keys(54) <= i2c_bit;-- ^
+              when  8 => current_keys(75) <= i2c_bit;-- RESTORE
                          restore <= i2c_bit;
               when others => null;
             end case;
@@ -389,18 +389,19 @@ begin  -- behavioural
               when 2 => current_keys(32) <= i2c_bit;-- 9
               when 1 => current_keys(5) <= i2c_bit;-- F3
               when 0 => current_keys(4) <= i2c_bit;-- F1
-              -- Seemingly not working
-              when 8 => current_keys(64) <= i2c_bit;-- NOSCROLL
-              when 9 => current_keys(72) <= i2c_bit;-- CAPSLOCK
+                        -- Seemingly not working
+                        -- Probably reversed, as NOSCROLL does 3
+              when 15 => current_keys(64) <= i2c_bit;-- NOSCROLL
+              when 14 => current_keys(72) <= i2c_bit;-- CAPSLOCK
                         -- XXX need to cancel/toggle CAPSLOCK when held for
                         -- fast-key behaviour
                         LED_CAPS <= i2c_bit;
-              when 10 => current_keys(66) <= i2c_bit;-- ALT
-              when 11 => current_keys(71) <= i2c_bit;-- ESC
-              when 12 => current_keys(63) <= i2c_bit;-- RUNSTOP
-              when 13 => current_keys(56) <= i2c_bit;-- 1
-              when 14 => current_keys(59) <= i2c_bit;-- 2
-              when 15 => current_keys(8) <= i2c_bit;-- 3
+              when 13 => current_keys(66) <= i2c_bit;-- ALT
+              when 12 => current_keys(71) <= i2c_bit;-- ESC
+              when 11 => current_keys(63) <= i2c_bit;-- RUNSTOP
+              when 10 => current_keys(56) <= i2c_bit;-- 1
+              when  9 => current_keys(59) <= i2c_bit;-- 2
+              when  8 => current_keys( 8) <= i2c_bit;-- 3
               when others => null;
             end case;
             
