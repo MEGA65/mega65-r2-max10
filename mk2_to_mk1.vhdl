@@ -125,12 +125,8 @@ begin  -- behavioural
 
       -- Periodically re-initialise U1, so that if keyboard is hot-swapped,
       -- LEDs still work (really just to make my life easier during development)
-      if counter < 50_000_000 then
-        counter <= counter + 1;
-      else
-        counter <= 0;
-        u1_reg6 <= '1';
-        u1_active <= '0';
+      if counter > 0 then
+        counter <= counter - 1;
       end if;
 
       -- Flash both leds like ambulance lights if no signal from the computer
@@ -486,6 +482,13 @@ begin  -- behavioural
           current_keys <= (others => '1');
           -- Update LEDs
           i2c_state <= 500;
+
+          if counter = 0 then
+            counter <= 50_000_000;
+            u1_reg6 <= '1';
+            u1_active <= '0';
+          end if;
+          
         end if;
       end if;
       
